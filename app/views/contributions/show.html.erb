@@ -1,0 +1,28 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Candidate:</b>
+  <%= link_to @contribution["candidate"], :controller => "candidates", :action => "show", :id => @contribution["candidate_id"] %>
+</p>
+
+<p>
+  <b>Contributor:</b>
+  <%= link_to @contribution["contributor"], :controller => "contributors", :action => "show", :id => @contribution["contributor_id"] %>
+</p>
+
+<p>
+  <b>Date:</b>
+  <%= @contribution["date"] %>
+</p>
+
+<p>
+  <b>Amount:</b>
+  <%= @contribution["amount"] %>
+</p>
+
+<p>
+  <b>Contribution type:</b>
+  <%= @contribution["contribution_type"] %>
+</p>
+
+<%= link_to 'List All Contribitions', contributions_path %>

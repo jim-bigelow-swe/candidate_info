@@ -1,0 +1,69 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Last:</b>
+  <%= @contributor.last %>
+</p>
+
+<p>
+  <b>Suffix:</b>
+  <%= @contributor.suffix %>
+</p>
+
+<p>
+  <b>First:</b>
+  <%= @contributor.first %>
+</p>
+
+<p>
+  <b>Middle:</b>
+  <%= @contributor.middle %>
+</p>
+
+<p>
+  <b>Mailing:</b>
+  <%= @contributor.mailing %>
+</p>
+
+<p>
+  <b>City:</b>
+  <%= @contributor.city %>
+</p>
+
+<p>
+  <b>State:</b>
+  <%= @contributor.state %>
+</p>
+
+<p>
+  <b>Zip:</b>
+  <%= @contributor.zip %>
+</p>
+
+<p>
+  <b>Total Contributions</b>
+  <%= @contribution_total %>
+</p>
+
+<table>
+  <tr>
+    <th>Candidate</th>
+    <th>Date</th>
+    <th>Amount</th>
+    <th>Contribution type</th>
+    <th></th>
+  </tr>
+
+<% @contributions.each do |contribution| %>
+  <tr>
+    <td><%= link_to contribution["candidate"], :controller => "candidates", :action => "show", :id => contribution["candidate_id"] %></td>
+    <td><%= contribution["date"] %></td>
+    <td><%= link_to contribution["amount"], :controller => "contributions", :action => "show", :id => contribution["id"] %></td>
+    <td><%= contribution["contribution_type"] %></td>
+    <td><%= link_to 'Show', :controller => "contributions", :action => "show", :id => contribution["id"] %></td>
+  </tr>
+<% end %>
+</table>
+
+
+<%= link_to 'List All Contributors', contributors_path %>

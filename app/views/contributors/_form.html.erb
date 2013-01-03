@@ -1,0 +1,49 @@
+<%= form_for(@contributor) do |f| %>
+  <% if @contributor.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@contributor.errors.count, "error") %> prohibited this contributor from being saved:</h2>
+
+      <ul>
+      <% @contributor.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :last %><br />
+    <%= f.text_field :last %>
+  </div>
+  <div class="field">
+    <%= f.label :suffix %><br />
+    <%= f.text_field :suffix %>
+  </div>
+  <div class="field">
+    <%= f.label :first %><br />
+    <%= f.text_field :first %>
+  </div>
+  <div class="field">
+    <%= f.label :middle %><br />
+    <%= f.text_field :middle %>
+  </div>
+  <div class="field">
+    <%= f.label :mailing %><br />
+    <%= f.text_field :mailing %>
+  </div>
+  <div class="field">
+    <%= f.label :city %><br />
+    <%= f.text_field :city %>
+  </div>
+  <div class="field">
+    <%= f.label :state %><br />
+    <%= f.text_field :state %>
+  </div>
+  <div class="field">
+    <%= f.label :zip %><br />
+    <%= f.text_field :zip %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

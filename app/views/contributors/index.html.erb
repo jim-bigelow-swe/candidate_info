@@ -1,0 +1,37 @@
+<h1>Listing contributors</h1>
+
+<table>
+  <tr>
+    <th>Last</th>
+    <th>Suffix</th>
+    <th>First</th>
+    <th>Middle</th>
+    <th>Mailing</th>
+    <th>City</th>
+    <th>State</th>
+    <th>Zip</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @contributors.each do |contributor| %>
+  <tr>
+    <td><%= contributor.last %></td>
+    <td><%= contributor.suffix %></td>
+    <td><%= contributor.first %></td>
+    <td><%= contributor.middle %></td>
+    <td><%= contributor.mailing %></td>
+    <td><%= contributor.city %></td>
+    <td><%= contributor.state %></td>
+    <td><%= contributor.zip %></td>
+    <td><%= link_to 'Show', contributor %></td>
+    <td><%= link_to 'Edit', edit_contributor_path(contributor) %></td>
+    <td><%= link_to 'Destroy', contributor, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Contributor', new_contributor_path %>

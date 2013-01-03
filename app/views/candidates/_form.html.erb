@@ -1,0 +1,53 @@
+<%= form_for(@candidate) do |f| %>
+  <% if @candidate.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@candidate.errors.count, "error") %> prohibited this candidate from being saved:</h2>
+
+      <ul>
+      <% @candidate.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :elected %><br />
+    <%= f.check_box :elected %>
+  </div>
+  <div class="field">
+    <%= f.label :year %><br />
+    <%= f.date_select :year %>
+  </div>
+  <div class="field">
+    <%= f.label :last %><br />
+    <%= f.text_field :last %>
+  </div>
+  <div class="field">
+    <%= f.label :suffix %><br />
+    <%= f.text_field :suffix %>
+  </div>
+  <div class="field">
+    <%= f.label :first %><br />
+    <%= f.text_field :first %>
+  </div>
+  <div class="field">
+    <%= f.label :middle %><br />
+    <%= f.text_field :middle %>
+  </div>
+  <div class="field">
+    <%= f.label :party %><br />
+    <%= f.text_field :party %>
+  </div>
+  <div class="field">
+    <%= f.label :district %><br />
+    <%= f.text_field :district %>
+  </div>
+  <div class="field">
+    <%= f.label :office %><br />
+    <%= f.text_field :office %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

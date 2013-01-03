@@ -1,0 +1,29 @@
+<h1>Listing contributions</h1>
+
+<table>
+  <tr>
+    <th>Candidate</th>
+    <th>Contributor</th>
+    <th>Date</th>
+    <th>Amount</th>
+    <th>Contribution type</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @contributions.each do |contribution| %>
+  <tr>
+    <td><%= link_to contribution["candidate"], :controller => "candidates", :action => "show", :id => contribution["candidate_id"] %></td>
+    <td><%= link_to contribution["contributor"], :controller => "contributors", :action => "show", :id => contribution["contributor_id"] %></td>
+    <td><%= contribution["date"] %></td>
+    <td><%= contribution["amount"] %></td>
+    <td><%= contribution["contribution_type"] %></td>
+    <td><%= link_to 'Show', :controller => "contributions", :action => "show", :id => contribution["id"] %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Contribution', new_contribution_path %>

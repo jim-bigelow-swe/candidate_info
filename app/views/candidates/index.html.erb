@@ -1,0 +1,38 @@
+<h1>Listing candidates</h1>
+
+<table>
+  <tr>
+    <th>Elected</th>
+    <th>Year</th>
+    <th>Last</th>
+    <th>Suffix</th>
+    <th>First</th>
+    <th>Middle</th>
+    <th>Party</th>
+    <th>District</th>
+    <th>Office</th>
+    <th>Total Contributions</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @candidates.each do |candidate| %>
+  <tr>
+    <td><%= (candidate["elected"] == 'f' ? "No": "Yes") %></td>
+    <td><%= candidate["year"] %></td>
+    <td><%= candidate["last"] %></td>
+    <td><%= candidate["suffix"] %></td>
+    <td><%= candidate["first"] %></td>
+    <td><%= candidate["middle"] %></td>
+    <td><%= candidate["party"] %></td>
+    <td><%= candidate["district"] %></td>
+    <td><%= candidate["office"] %></td>
+    <td><%= candidate["contribution_total"] %></td>
+    <td><%= link_to 'Show', :controller => "candidates", :action => "show", :id => candidate["id"] %></td>
+    <td><%= link_to 'Edit', :controller => "candidates", :action => "edit", :id => candidate["id"] %></td>
+  </tr>
+<% end %>
+</table>
+
+
