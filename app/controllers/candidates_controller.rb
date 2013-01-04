@@ -8,7 +8,7 @@ class CandidatesController < ApplicationController
     contributions = Candidate.connection.select_all("SELECT * from contributions")
     #debugger
     contributions.each do |contribution|
-      id = contribution["candidate_id"]
+      id = contribution["candidate_id"].to_s
       if @contribution_amounts[id].nil?
         @contribution_amounts[id] = contribution["amount"]
       else

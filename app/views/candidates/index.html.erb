@@ -28,7 +28,7 @@
     <td><%= candidate.party %></td>
     <td><%= candidate.district %></td>
     <td><%= candidate.office %></td>
-    <td><%= @contribution_amounts[candidate.id] %></td>
+    <td><%= @contribution_amounts[candidate.id.to_s] %></td>
     <td><%= link_to 'Show', candidate %></td>
     <td><%= link_to 'Edit', edit_candidate_path(candidate) %></td>
   </tr>
