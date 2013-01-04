@@ -5,7 +5,8 @@ require 'active_resource'
 #ActiveResource::Base.logger = Logger.new("#{File.dirname(__FILE__)}/events.log")
 
 class Contribution < ActiveResource::Base
-  self.site = "http://localhost:3000"
+  #self.site = "http://localhost:3000"
+  self.site = "http://immense-forest-6797.herokuapp.com/"
   #self.site = "http://tranquil-fortress-2636.herokuapp.com"
 end
 

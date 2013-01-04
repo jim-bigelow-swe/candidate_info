@@ -4,7 +4,14 @@ class CandidatesController < ApplicationController
   def index
     #@candidates = Candidate.all
     @candidates = Candidate.connection.select_all(
-       "SELECT candidates.* , SUM(contributions.amount) as contribution_total
+       "SELECT  candidates.last, candidates.elected, candidates.year,
+        candidates.id,
+        candidates.first,
+        candidates.middle,
+        candidates.party,
+        candidates.district,
+        candidates.office,
+        SUM(contributions.amount) as contribution_total
         FROM candidates
         INNER JOIN contributions ON contributions.candidate_id = candidates.id
         GROUP BY candidates.last" )
