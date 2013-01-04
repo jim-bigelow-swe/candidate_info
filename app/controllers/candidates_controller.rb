@@ -2,20 +2,19 @@ class CandidatesController < ApplicationController
   # GET /candidates
   # GET /candidates.json
   def index
-    #@candidates = Candidate.all
-    @candidates = Candidate.connection.select_all(
-       "SELECT  candidates.last, candidates.elected, candidates.year,
-        candidates.id,
-        candidates.first,
-        candidates.middle,
-        candidates.party,
-        candidates.district,
-        candidates.office,
-        SUM(contributions.amount) as contribution_total
-        FROM candidates
-        INNER JOIN contributions ON contributions.candidate_id = candidates.id
-        GROUP BY candidates.last" )
 
+    @candidates = Candidate.all
+    @contribution_amounts = Hash.new
+    contributions = Candidate.connection.select_all("SELECT * from contributions")
+    #debugger
+    contributions.each do |contribution|
+      id = contribution["candidate_id"]
+      if @contribution_amounts[id].nil?
+        @contribution_amounts[id] = contribution["amount"]
+      else
+        @contribution_amounts[id] += contribution["amount"]
+      end
+    end
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: @candidates }
@@ -109,4 +108,5 @@ class CandidatesController < ApplicationController
       format.json { head :no_content }
     end
   end
+
 end
