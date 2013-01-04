@@ -10,9 +10,9 @@ class CandidatesController < ApplicationController
     contributions.each do |contribution|
       id = contribution["candidate_id"].to_s
       if @contribution_amounts[id].nil?
-        @contribution_amounts[id] = contribution["amount"]
+        @contribution_amounts[id] = contribution["amount"].to_f
       else
-        @contribution_amounts[id] += contribution["amount"]
+        @contribution_amounts[id] += contribution["amount"].to_f
       end
     end
     respond_to do |format|
