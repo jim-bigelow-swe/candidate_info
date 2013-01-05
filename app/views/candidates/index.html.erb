@@ -1,6 +1,6 @@
 <h1>Listing candidates</h1>
 
-<table>
+<table id="candidates">
   <tr>
     <th>Elected</th>
     <th>Year</th>
@@ -28,7 +28,7 @@
     <td><%= candidate.party %></td>
     <td><%= candidate.district %></td>
     <td><%= candidate.office %></td>
-    <td><%= @contribution_amounts[candidate.id.to_s] %></td>
+    <td><%= @contribution_amounts[candidate.id.to_s].to_f %></td>
     <td><%= link_to 'Show', candidate %></td>
     <td><%= link_to 'Edit', edit_candidate_path(candidate) %></td>
   </tr>

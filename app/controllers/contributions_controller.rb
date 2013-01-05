@@ -6,12 +6,13 @@ class ContributionsController < ApplicationController
     @page_title = "All Contributions"
     @contributions =
       Contribution.connection.select_all(
-       "SELECT candidates.last as candidate, contributors.last as contributor,
+       "SELECT candidates.last as candidate, candidates.elected,
+        contributors.last as contributor,
         contributions.*
         FROM contributions
         INNER JOIN candidates ON contributions.candidate_id = candidates.id
         INNER JOIN contributors ON contributors.id = contributions.contributor_id")
-
+    #debugger
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: @contributions }
