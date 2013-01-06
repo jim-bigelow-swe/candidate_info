@@ -1,0 +1,21 @@
+
+<table class="contributionList>
+  <tr>
+    <th>Contributor</th>
+    <th>Date</th>
+    <th>Amount</th>
+    <th>Contribution type</th>
+    <th></th>
+  </tr>
+<% @contributions.each do |contribution| %>
+  <tr>
+    <td><%= link_to contribution["contributor"], :controller => "contributors", :action => "show", :id => contribution["contributor_id"] %></td>
+    <td><%= contribution["date"] %></td>
+    <td><%= link_to contribution["amount"], :controller => "contributions", :action => "show", :id => contribution["id"] %></td>
+    <td><%= contribution["contribution_type"] %></td>
+    <td><%= link_to 'Show', :controller => "contributions", :action => "show", :id => contribution["id"] %></td>
+  </tr>
+<% end %>
+</table>
+
+<%= link_to 'Edit', edit_candidate_path(@candidate) %>

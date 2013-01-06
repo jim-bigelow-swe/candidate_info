@@ -40,6 +40,8 @@ class CandidatesController < ApplicationController
         INNER JOIN contributors ON contributions.contributor_id = contributors.id
         WHERE contributions.candidate_id = #{params[:id].to_i}" )
 
+    render :partial => 'list_contributions', :object => @contributions and return if request.xhr?
+
     respond_to do |format|
       format.html # show.html.erb
       format.json { render json: @candidate }
