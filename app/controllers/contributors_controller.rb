@@ -5,6 +5,18 @@ class ContributorsController < ApplicationController
     @page_title = "Contributors Listing"
     @contributors = Contributor.all
 
+    debugger
+    @contribution_amounts = Hash.new
+    contributions = Contribution.connection.select_all("SELECT * from contributions")
+    contributions.each do |contribution|
+      id = contribution["contributor_id"].to_s
+      if @contribution_amounts[id].nil?
+        @contribution_amounts[id] = contribution["amount"].to_f
+      else
+        @contribution_amounts[id] += contribution["amount"].to_f
+      end
+    end
+
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: @contributors }

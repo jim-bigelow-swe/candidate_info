@@ -10,14 +10,13 @@
     <th>City</th>
     <th>State</th>
     <th>Zip</th>
-    <th></th>
-    <th></th>
+    <th>Contributions</th>
     <th></th>
   </tr>
 
 <% @contributors.each do |contributor| %>
   <tr>
-    <td><%= contributor.last %></td>
+    <td><%= link_to contributor.last, contributor %></td>
     <td><%= contributor.suffix %></td>
     <td><%= contributor.first %></td>
     <td><%= contributor.middle %></td>
@@ -25,13 +24,9 @@
     <td><%= contributor.city %></td>
     <td><%= contributor.state %></td>
     <td><%= contributor.zip %></td>
-    <td><%= link_to 'Show', contributor %></td>
+    <td><%= link_to  @contribution_amounts[contributor.id.to_s].to_f, {:controller => "contributors", :action => "show", :id => contributor.id}, :class => "list_contribs" %></td>
     <td><%= link_to 'Edit', edit_contributor_path(contributor) %></td>
-    <td><%= link_to 'Destroy', contributor, method: :delete, data: { confirm: 'Are you sure?' } %></td>
   </tr>
 <% end %>
 </table>
 
-<br />
-
-<%= link_to 'New Contributor', new_contributor_path %>

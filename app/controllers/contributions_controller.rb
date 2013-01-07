@@ -12,7 +12,6 @@ class ContributionsController < ApplicationController
         FROM contributions
         INNER JOIN candidates ON contributions.candidate_id = candidates.id
         INNER JOIN contributors ON contributors.id = contributions.contributor_id")
-    #debugger
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: @contributions }

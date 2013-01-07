@@ -1,45 +1,46 @@
 <p id="notice"><%= notice %></p>
-
-<p>
+<h2><%= "#{@contributor.first} #{@contributor.last}" %> </h2>
+<ul>
+<li>
   <b>Last:</b>
   <%= @contributor.last %>
-</p>
+</li>
 
-<p>
+<li>
   <b>Suffix:</b>
   <%= @contributor.suffix %>
-</p>
+</li>
 
-<p>
+<li>
   <b>First:</b>
   <%= @contributor.first %>
-</p>
+</li>
 
-<p>
+<li>
   <b>Middle:</b>
   <%= @contributor.middle %>
-</p>
+</li>
 
-<p>
+<li>
   <b>Mailing:</b>
   <%= @contributor.mailing %>
-</p>
+</li>
 
-<p>
+<li>
   <b>City:</b>
   <%= @contributor.city %>
-</p>
+</li>
 
-<p>
+<li>
   <b>State:</b>
   <%= @contributor.state %>
-</p>
+</li>
 
-<p>
+<li>
   <b>Zip:</b>
   <%= @contributor.zip %>
-</p>
-
+</li>
+</ul>
 <p>
   <b>Total Contributions</b>
   <%= @contribution_total %>
