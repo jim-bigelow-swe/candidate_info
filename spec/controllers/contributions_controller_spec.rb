@@ -24,7 +24,31 @@ describe ContributionsController do
   # Contribution. As you add validations to Contribution, be sure to
   # update the return value of this method accordingly.
   def valid_attributes
-    { "candidate_id" => "" }
+    { :date              => "2010-09-17",
+      :amount            => "250.00",
+      :contribution_type => "C",
+      :candidates_attributes => {
+        :elected  => false,
+        :year     => "2011-11-06",
+        :last     => "Eskridge",
+        :suffix   => "",
+        :first    => "George",
+        :middle   => "E.",
+        :party    => "REP",
+        :district => "1",
+        :office   => "STATE REP., POSITION B"
+      },
+      :contributors_attributes => {
+        :last    => "AGRA PAC",
+        :suffix  => "",
+        :first   => "",
+        :middle  => "",
+        :mailing => "PO BOX 4848",
+        :city    => "POCATELLO",
+        :state   => "ID",
+        :zip     => "83205"
+      }
+    }
   end
 
   # This should return the minimal set of values that should be in the session
@@ -69,6 +93,7 @@ describe ContributionsController do
     describe "with valid params" do
       it "creates a new Contribution" do
         expect {
+          debugger
           post :create, {:contribution => valid_attributes}, valid_session
         }.to change(Contribution, :count).by(1)
       end

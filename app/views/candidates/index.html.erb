@@ -13,8 +13,6 @@
     <th>Office</th>
     <th>Total Contributions</th>
     <th></th>
-    <th></th>
-    <th></th>
   </tr>
 
 <% @candidates.each do |candidate| %>
@@ -29,7 +27,6 @@
     <td><%= candidate.district %></td>
     <td><%= candidate.office %></td>
     <td><%= link_to  @contribution_amounts[candidate.id.to_s].to_f, {:controller => "candidates", :action => "show", :id => candidate.id}, :class => "list_contribs" %></td>
-    <td><%= link_to 'Show', candidate %></td>
     <td><%= link_to 'Edit', edit_candidate_path(candidate) %></td>
   </tr>
 <% end %>

@@ -59,11 +59,23 @@ class ContributionsController < ApplicationController
   # POST /contributions
   # POST /contributions.json
   def create
+    debugger
 
     @contribution_params = params[:contribution]
+    if @contribution_params.nil?
+      render(:nothing => true) and return
+    end
+
     attr = @contribution_params.delete :candidates_attributes
+    if attr.nil?
+      render(:nothing => true) and return
+    end
     @candidate_params =  attr[:candidates_attributes]
+
     attr = @contribution_params.delete :contributors_attributes
+    if attr.nil?
+      render(:nothing => true) and return
+    end
     @contributor_params = attr[:contributors_attributes]
 
     @new_candidate = false

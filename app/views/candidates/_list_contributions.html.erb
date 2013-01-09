@@ -1,11 +1,11 @@
 
 <table class="contributionList">
+  <caption>Breakout of all contributions made to  <%= @candidate.last %></caption>
   <tr>
     <th>Contributor</th>
     <th>Date</th>
     <th>Amount</th>
     <th>Contribution type</th>
-    <th></th>
   </tr>
 <% @contributions.each do |contribution| %>
   <tr>
@@ -13,9 +13,9 @@
     <td><%= contribution["date"] %></td>
     <td><%= link_to contribution["amount"], :controller => "contributions", :action => "show", :id => contribution["id"] %></td>
     <td><%= contribution["contribution_type"] %></td>
-    <td><%= link_to 'Show', :controller => "contributions", :action => "show", :id => contribution["id"] %></td>
   </tr>
 <% end %>
 </table>
 
-<%= link_to 'Edit', edit_candidate_path(@candidate) %>
+<%= link_to 'Edit Candidate', edit_candidate_path(@candidate) %> |
+<%= link_to 'Close', '', {:id => 'closeLink'} %>

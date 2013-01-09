@@ -5,7 +5,7 @@ class ContributorsController < ApplicationController
     @page_title = "Contributors Listing"
     @contributors = Contributor.all
 
-    debugger
+    #debugger
     @contribution_amounts = Hash.new
     contributions = Contribution.connection.select_all("SELECT * from contributions")
     contributions.each do |contribution|

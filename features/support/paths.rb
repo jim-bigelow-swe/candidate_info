@@ -21,6 +21,12 @@ module NavigationHelpers
     #
     #   when /^(.*)'s profile page$/i
     #     user_profile_path(User.find_by_login($1))
+    when /^the candidates page$/
+      '/candidates'
+    when /^the contributors page$/
+      '/contributors'
+    when /^the contributions page$/
+      '/contributions'
 
     else
       begin
