@@ -6,6 +6,7 @@ Given /^the following contribution records exist:$/ do |table|
   Contributor.delete_all(1)
   @candidates = Hash.new
   table.hashes.each do |record|
+    debugger
 
     if @candidates[record[:cand_last].to_s].nil?
 
@@ -14,9 +15,9 @@ Given /^the following contribution records exist:$/ do |table|
                                      :suffix   => record[:cand_suf],
                                      :first    => record[:cand_first],
                                      :middle   => record[:cand_mid],
-                                     :party    => record[:cand_party],
-                                     :district => record[:cand_district],
-                                     :office   => record[:cand_office]
+                                     :party    => record[:party],
+                                     :district => (record[:district] =~ /NULL/ ? "" : record[:district]),
+                                     :office   => record[:office]
                                      )
       @candidates[@candidate.last] = @candidate.id
       @candidate_id = @candidate.id
@@ -25,25 +26,28 @@ Given /^the following contribution records exist:$/ do |table|
     end
 
 
-    @contributor = Contributor.create!(
-      :last    => record[:contr_last],
-      :suffix  => record[:contr_suf],
-      :first   => record[:contr_first],
-      :middle  => record[:contr_mid],
-      :mailing => record[:contr_mailing],
-      :city    => record[:contr_city],
-      :state   => record[:contr_st],
-      :zip     => record[:contr_zip]
+    @contributor = Contributor.create!(:kind    => record[:contr_kind],
+                                       :last    => record[:contr_last],
+                                       :suffix  => record[:contr_suf],
+                                       :first   => record[:contr_first],
+                                       :middle  => record[:contr_mid],
+                                       :mailing1 => record[:contr_mailing1],
+                                       :mailing2 => record[:contr_mailing2],
+                                       :city    => record[:contr_city],
+                                       :state   => record[:st],
+                                       :zip     => record[:contr_zip],
+                                       :country => record[:contr_countr]
     )
 
+    date_fields = record[:contr_date].split("/")
+    contrib_date = "#{date_fields[2]}-#{date_fields[0]}-#{date_fields[1]}"
     @contribution = Contribution.create!(
-      :date              => record[:contr_date],
+      :date              => Date.parse(contrib_date).to_formatted_s(:db),
       :amount            => record[:contr_amount].tr('",', ''),
       :contribution_type => record[:contr_type],
       :candidate_id      => @candidate_id,
       :contributor_id    => @contributor.id
     )
-    debugger
   end
 end
 

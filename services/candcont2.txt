@@ -1,2 +1,0 @@
-CandLast	CandSuf	CandFirst	CandMid	Party	District	Office	ContrDate	ContrAmount	ContrType	ContrLast	ContrSuf	ContrFirst	ContrMid	ContrMailing	ContrCity	ContrSt	ContrZip
-Anderson		Eric		REP	1	"STATE REP., POSITION A"	9/17/2010	250.00	C	AGRA PAC				PO BOX 4848	POCATELLO	ID	83205

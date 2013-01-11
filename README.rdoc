@@ -1,15 +1,26 @@
-== Welcome to TFI's Campaign Contributions Tracker
+# Welcome to TFI's Campaign Contributions Tracker
 
-This is a Ruby on Rails web service, candidate_info, that allows users to access the
-campaign contribution information submitted to the Idaho Secretrary Of State. 
+This is TransForm Idaho's (TFI) Ruby on Rails web service, candidate_info, that allows users to access the
+campaign contribution information submitted to the Idaho Secretary of State. TransForm Idaho will use the final campaign finance information reported to the Idaho Secretary of State to provide a site where people can easily access information about the people and groups that have contributed to the election campaign of Idaho Legislators.
+ 
+Data is uploaded into the service using a client that reads the data and creates contribution information in the web service and people can access the data via the RESTful URI's for candidates, contributions, and contributors.
 
-Data is uploaded into the service using a client that reads the data and creates contribution information in the web service. 
+## Campaign Contributions
 
-=== Campaign Contribtions
+Campaign contributions have three main parts:
 
-Campaign contributions are have three main part:
- * The cadidate receiving the contribution,
- * The contributor making the contributions, and 
- * The contribution itself, which consists of 
-   * the amount contributed, and 
-   * the date the contribution was made.
+1. The cadidate receiving the contribution,
+  * the candidate's name
+  * the office they are running for,
+  * the legislative district, if running for state senator or representative
+2. The contributor making the contributions, and 
+  * the kind of contributor: person, company, or PAC,
+  * the contributor's name, 
+  * mailing address, and
+  * country
+3. The contribution itself, which consists of 
+  * the amount contributed, 
+  * the type of contribution: a loan, in kind, cash, etc., and 
+  * the date the contribution was made.
+
+The data from the Idaho Secretary of State is in a spreadsheet with one line for each contribution that was reported. There is a spreadsheet for each election year, so this piece of information is implicit with each instance of a spreadsheet.
