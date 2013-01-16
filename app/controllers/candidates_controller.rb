@@ -67,6 +67,7 @@ class CandidatesController < ApplicationController
     @candidate = Candidate.find(params[:id])
   end
 
+=begin
   # POST /candidates
   # POST /candidates.json
   def create
@@ -110,5 +111,5 @@ class CandidatesController < ApplicationController
       format.json { head :no_content }
     end
   end
-
+=end
 end

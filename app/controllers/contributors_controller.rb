@@ -65,6 +65,7 @@ class ContributorsController < ApplicationController
     @contributor = Contributor.find(params[:id])
   end
 
+=begin
   # POST /contributors
   # POST /contributors.json
   def create
@@ -80,10 +81,12 @@ class ContributorsController < ApplicationController
       end
     end
   end
+=end
 
   # PUT /contributors/1
   # PUT /contributors/1.json
   def update
+    #debugger
     @contributor = Contributor.find(params[:id])
 
     respond_to do |format|
@@ -96,7 +99,7 @@ class ContributorsController < ApplicationController
       end
     end
   end
-
+=begin
   # DELETE /contributors/1
   # DELETE /contributors/1.json
   def destroy
@@ -108,4 +111,5 @@ class ContributorsController < ApplicationController
       format.json { head :no_content }
     end
   end
+=end
 end

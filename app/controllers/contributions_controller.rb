@@ -51,15 +51,11 @@ class ContributionsController < ApplicationController
     end
   end
 
-  # GET /contributions/1/edit
-  def edit
-    @contribution = Contribution.find(params[:id])
-  end
 
   # POST /contributions
   # POST /contributions.json
   def create
-    debugger
+    #debugger
 
     @contribution_params = params[:contribution]
     if @contribution_params.nil?
@@ -128,22 +124,6 @@ class ContributionsController < ApplicationController
     else
       respond_to do |format|
         format.html { render action: "new" }
-        format.json { render json: @contribution.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
-  # PUT /contributions/1
-  # PUT /contributions/1.json
-  def update
-    @contribution = Contribution.find(params[:id])
-
-    respond_to do |format|
-      if @contribution.update_attributes(params[:contribution])
-        format.html { redirect_to @contribution, notice: 'Contribution was successfully updated.' }
-        format.json { head :no_content }
-      else
-        format.html { render action: "edit" }
         format.json { render json: @contribution.errors, status: :unprocessable_entity }
       end
     end

@@ -6,7 +6,7 @@ Given /^the following contribution records exist:$/ do |table|
   Contributor.delete_all(1)
   @candidates = Hash.new
   table.hashes.each do |record|
-    debugger
+    #debugger
 
     if @candidates[record[:cand_last].to_s].nil?
 

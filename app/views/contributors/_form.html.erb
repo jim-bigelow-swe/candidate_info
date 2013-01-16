@@ -12,6 +12,15 @@
   <% end %>
 
   <div class="field">
+    <label>Kind of Contributor:</label><br/>
+    <%= f.label "Person" %>
+    <%= radio_button("contributor", "kind", "Person") %>
+    <%= f.label "Company" %>
+    <%= radio_button("contributor", "kind", "Company") %>
+    <%= f.label "PAC" %>
+    <%= radio_button("contributor", "kind", "PAC") %>
+  </div>
+  <div class="field">
     <%= f.label :last %><br />
     <%= f.text_field :last %>
   </div>
@@ -28,8 +37,12 @@
     <%= f.text_field :middle %>
   </div>
   <div class="field">
-    <%= f.label :mailing %><br />
-    <%= f.text_field :mailing %>
+    <%= f.label :mailing1 %><br />
+    <%= f.text_field :mailing1 %>
+  </div>
+  <div class="field">
+    <%= f.label :mailing2 %><br />
+    <%= f.text_field :mailing2 %>
   </div>
   <div class="field">
     <%= f.label :city %><br />
@@ -42,6 +55,10 @@
   <div class="field">
     <%= f.label :zip %><br />
     <%= f.text_field :zip %>
+  </div>
+  <div class="field">
+    <%= f.label :country %><br />
+    <%= f.text_field :country %>
   </div>
   <div class="actions">
     <%= f.submit %>

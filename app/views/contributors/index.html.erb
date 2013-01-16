@@ -1,30 +1,37 @@
 <h1>Listing contributors</h1>
 
-<table>
+<table id='contributors'>
   <tr>
-    <th>Last</th>
-    <th>Suffix</th>
-    <th>First</th>
-    <th>Middle</th>
-    <th>Mailing</th>
+    <th>Type of Contributor</th>
+    <th>Contributions</th>
+    <th>Name</th>
     <th>City</th>
     <th>State</th>
     <th>Zip</th>
-    <th>Contributions</th>
+    <th>Country</th>
+
     <th></th>
   </tr>
 
 <% @contributors.each do |contributor| %>
-  <tr>
-    <td><%= link_to contributor.last, contributor %></td>
-    <td><%= contributor.suffix %></td>
-    <td><%= contributor.first %></td>
-    <td><%= contributor.middle %></td>
-    <td><%= contributor.mailing %></td>
+  <tr class=<%= contributor.kind %> >
+    <td>
+      <%= form_for(contributor) do |f| %>
+        <%= f.label "Person" %>
+      <%= radio_button("contributor", "kind", "Person", { :checked => (contributor.kind =~ /Person/ ? true : false) } )%>
+        <%= f.label "Company" %>
+        <%= radio_button("contributor", "kind", "Company", { :checked => (contributor.kind =~ /Company/ ? true : false) }) %>
+        <%= f.label "PAC" %>
+        <%= radio_button("contributor", "kind", "PAC", { :checked => (contributor.kind =~ /PAC/ ? true : false) }) %>
+        <%= f.submit "Update Type", { :class => "contrib_kind_submit" } %>
+     <% end %>
+    </td>
+    <td><%= link_to  @contribution_amounts[contributor.id.to_s].to_f, {:controller => "contributors", :action => "show", :id => contributor.id}, :class => "list_contribs" %></td>
+    <td><%= link_to ( contributor.kind =~ /Person/ ? "#{contributor.first} #{contributor.middle} #{contributor.last}"  : contributor.last ), contributor, :class => 'update_contributor' %></td>
     <td><%= contributor.city %></td>
     <td><%= contributor.state %></td>
     <td><%= contributor.zip %></td>
-    <td><%= link_to  @contribution_amounts[contributor.id.to_s].to_f, {:controller => "contributors", :action => "show", :id => contributor.id}, :class => "list_contribs" %></td>
+    <td><%= contributor.country %></td>
     <td><%= link_to 'Edit', edit_contributor_path(contributor) %></td>
   </tr>
 <% end %>

@@ -17,22 +17,22 @@ Background: contribution records in the database
 
 Scenario: List Candidates
   When I go to the candidates page 
-  Then I should see Candidate "Keough"
+  Then I should see Candidate "Andersen"
 
 Scenario: Show Candidate's Total Contributions
   When I go to the candidates page 
-  Then I should see "1250"
+  Then I should see "2187.04"
 
 Scenario: List Contributions
   When I go to the contributions page 
-  Then I should see Candidate "Keough"
+  Then I should see Candidate "Allred"
 
 Scenario: List Contributors
   When I go to the contributors page 
-  Then I should see "AGRA PAC"
+  Then I should see "Ellison"
 
 Scenario: Show Contributor's Total Contributions
   When I go to the contributors page 
-  Then I should see "1000"
+  Then I should see "2187.04"
 
 

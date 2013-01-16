@@ -9,9 +9,8 @@ require 'optparse'
 require 'active_resource'
 
 class Contribution < ActiveResource::Base
-  #self.site = "http://localhost:3000"
-  self.site = "http://immense-forest-6797.herokuapp.com/"
-  #self.site = "http://tranquil-fortress-2636.herokuapp.com"
+  self.site = "http://localhost:3000"
+  #self.site = "http://immense-forest-6797.herokuapp.com/"
 end
 
 
@@ -31,7 +30,7 @@ end
      options[:verbose] = true
    end
 
-  options[:elected] = ""
+  options[:elected] = "2013_2014_Legislator_List.txt"
   opts.on( '-e', '--elected FILE', "Mandatory argument, list of elected legislators" ) do|f|
     options[:elected] = f
   end
@@ -55,77 +54,73 @@ optparse.parse!
 puts "Being verbose" if options[:verbose]
 
 legislators = Hash.new
-if options[:elected].nil? or options[:elected].empty?
-  puts "Must provide a file containing the elected officials"
-else
-  line_number = 0
-  puts "Reading #{options[:elected]} to find the candidates that were elected"
-  File.open(options[:elected]).each do |record|
-    line_number += 1
-    if line_number > 1  # skip first line of column headers
-      if record.chomp != "\t\t\t"
-        fields = record.chomp.split("\t")
-        entire_name =  fields[5].gsub(/^\"/, "").gsub(/\"$/, "").gsub(/\"\"/, '"')
-        name = entire_name.split(" ")
-        #print "#{entire_name}\t #{name.length}\n"
+line_number = 0
+puts "Reading #{options[:elected]} to find the candidates that were elected"
+File.open(options[:elected]).each do |record|
+  line_number += 1
+  if line_number > 1  # skip first line of column headers
+    if record.chomp != "\t\t\t"
+      fields = record.chomp.split("\t")
+      entire_name =  fields[5].gsub(/^\"/, "").gsub(/\"$/, "").gsub(/\"\"/, '"')
+      name = entire_name.split(" ")
+      #print "#{entire_name}\t #{name.length}\n"
 
+      first = name[0]
+      middle = ""
+      last = ""
+      suffix = ""
+      if name.length == 2
         first = name[0]
-        middle = ""
-        last = ""
-        suffix = ""
-        if name.length == 2
-          first = name[0]
-          last = name[1]
-        elsif name.length == 3
-          first = name[0]
-          middle = name[1]
-          last = name[2]
-          if middle =~ /^Van/
-            ## prepend middle to last name
-            last = middle + " " + last
-            middle = ""
+        last = name[1]
+      elsif name.length == 3
+        first = name[0]
+        middle = name[1]
+        last = name[2]
+        if middle =~ /^Van/
+          ## prepend middle to last name
+          last = middle + " " + last
+          middle = ""
 
-          elsif first =~ /\.$/
-            # append middle to first
-            first = first + " " + middle
-            middle = ""
-          end
-
-        else
-          if name[name.length-1] =~ /\.$/
-            #print "#{name[name.length-1]} is a suffix use "
-            middle = name[1]
-            last = name[name.length-2]
-            suffix = name[name.length-1]
-          elsif name[1] =~ /\.$/
-            # middle name is abbreviation, ignore anything between middle and last
-            last = name[name.length-1]
-            middle = name[1]
-          elsif name[1] =~ /^An$/
-            # append to first, ex.:  "Jo An E. Wood"
-            first << " " + name[1]
-            middle = name[2]
-            last = name[3]
-          else
-            last = name[name.length-1]
-          end
+        elsif first =~ /\.$/
+          # append middle to first
+          first = first + " " + middle
+          middle = ""
         end
 
-        #print "#{first}, #{middle}, #{last}, #{suffix}\n"
-        legislators[last] = {:first => first, :middle => middle, :suffix => suffix}
+      else
+        if name[name.length-1] =~ /\.$/
+          #print "#{name[name.length-1]} is a suffix use "
+          middle = name[1]
+          last = name[name.length-2]
+          suffix = name[name.length-1]
+        elsif name[1] =~ /\.$/
+          # middle name is abbreviation, ignore anything between middle and last
+          last = name[name.length-1]
+          middle = name[1]
+        elsif name[1] =~ /^An$/
+          # append to first, ex.:  "Jo An E. Wood"
+          first << " " + name[1]
+          middle = name[2]
+          last = name[3]
+        else
+          last = name[name.length-1]
+        end
       end
+
+      #print "#{first}, #{middle}, #{last}, #{suffix}\n"
+      legislators[last] = {:first => first, :middle => middle, :suffix => suffix}
     end
   end
-
-
-  if options[:verbose]
-    puts "Elected Legislators"
-    legislators.each_pair do | key, value|
-      print "#{key}, #{value}\n"
-    end
-  end
-
 end
+
+
+if options[:verbose]
+  puts "Elected Legislators"
+  legislators.each_pair do | key, value|
+    print "#{key}, #{value}\n"
+  end
+end
+
 
 ARGV.each do|f|
    puts "adding candidates, contribitors and contributions from #{f}..."
@@ -163,34 +158,38 @@ ARGV.each do|f|
 
         fields = record.chomp.split("\t")
         date_fields = fields[8].split("/")
-        contrib_date = "#{date_fields[2]}-#{date_fields[0]}-#{date_fields[1]}"
-        Contribution.create(:date              => Date.parse(contrib_date).to_formatted_s(:db),
-                            :amount            => fields[9].tr('",', ''),
-                            :contribution_type => fields[7],
-                            :candidates_attributes => {
-                              :year     => "2012-09-13",
-                              :elected  => (legislators[fields[0]].nil? ? false : true),
-                              :last     => fields[0],
-                              :suffix   => fields[3],
-                              :first    => fields[1],
-                              :middle   => fields[2],
-                              :party    => fields[4],
-                              :district => fields[5],
-                              :office   => fields[6]
-                            },
-                            :contributors_attributes => {
-                              :kind    => fields[10],
-                              :last    => fields[11],
-                              :suffix  => fields[14],
-                              :first   => fields[12],
-                              :middle  => fields[13],
-                              :mailing1 => fields[15],
-                              :mailing2 => fields[16],
-                              :city    => fields[17],
-                              :state   => fields[18],
-                              :zip     => fields[19],
-                              :country => fields[20]
-                            })
+        contrib_date = Date.parse("#{date_fields[2]}-#{date_fields[0]}-#{date_fields[1]}").to_formatted_s(:db)
+        candidate_was_elected = legislators[fields[0]].nil? ? false : true
+        contribution_params = {
+          :date              => contrib_date,
+          :amount            => fields[9].tr('",', ''),
+          :contribution_type => fields[7],
+          :candidates_attributes => {
+            :year     => "2012-09-13",
+            :elected  => candidate_was_elected,
+            :last     => fields[0],
+            :suffix   => fields[3],
+            :first    => fields[1],
+            :middle   => fields[2],
+            :party    => fields[4],
+            :district => fields[5],
+            :office   => fields[6]
+          },
+          :contributors_attributes => {
+            :kind    => fields[10],
+            :last    => fields[11],
+            :suffix  => fields[14],
+            :first   => fields[12],
+            :middle  => fields[13],
+            :mailing1 => fields[15],
+            :mailing2 => fields[16],
+            :city    => fields[17],
+            :state   => fields[18],
+            :zip     => fields[19],
+            :country => fields[20]
+          }
+        }
+        Contribution.create(contribution_params)
       end
     end
   end

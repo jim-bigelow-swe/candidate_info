@@ -15,9 +15,9 @@ CandidateInfo::Application.routes.draw do
   #
   resources :contributions, :except => [:update, :edit]
 
-  resources :contributors, :only => [:index, :show, :edit]
+  resources :contributors, :only => [:index, :show, :edit, :update]
 
-  resources :candidates,  :only => [:index, :show, :edit]
+  resources :candidates,  :only => [:index, :show, :edit, :update]
 
   get "home/index"
 

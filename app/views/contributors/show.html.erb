@@ -2,6 +2,10 @@
 <h2><%= "#{@contributor.first} #{@contributor.last}" %> </h2>
 <ul>
 <li>
+  <b>Kind of contributor:</b>
+  <%= @contributor.kind %>
+</li>
+<li>
   <b>Last:</b>
   <%= @contributor.last %>
 </li>
@@ -22,8 +26,12 @@
 </li>
 
 <li>
-  <b>Mailing:</b>
-  <%= @contributor.mailing %>
+  <b>Mailing1:</b>
+  <%= @contributor.mailing1%>
+</li>
+<li>
+  <b>Mailing2:</b>
+  <%= @contributor.mailing2 %>
 </li>
 
 <li>
@@ -40,7 +48,13 @@
   <b>Zip:</b>
   <%= @contributor.zip %>
 </li>
-</ul>
+
+  <li>
+  <b>Country:</b>
+  <%= @contributor.country %>
+</li>
+
+  </ul>
 <p>
   <b>Total Contributions</b>
   <%= @contribution_total %>
