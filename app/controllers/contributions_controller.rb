@@ -56,7 +56,6 @@ class ContributionsController < ApplicationController
   # POST /contributions.json
   def create
     #debugger
-
     @contribution_params = params[:contribution]
     if @contribution_params.nil?
       render(:nothing => true) and return
@@ -67,18 +66,21 @@ class ContributionsController < ApplicationController
       render(:nothing => true) and return
     end
     @candidate_params =  attr[:candidates_attributes]
+    puts "contributions create: candidate #{@candidate_params}"
 
     attr = @contribution_params.delete :contributors_attributes
     if attr.nil?
       render(:nothing => true) and return
     end
     @contributor_params = attr[:contributors_attributes]
+    puts "contributions create: contributor #{@contributor_params}"
 
     @new_candidate = false
     @candidates = Candidate.where(@candidate_params)
     if @candidates.nil? || @candidates.empty?
       @candidate = Candidate.create!(@candidate_params)
       @new_candidate = true
+      puts "contributions create: new candidate"
     else
       @candidate = @candidates[0]
     end
@@ -88,6 +90,7 @@ class ContributionsController < ApplicationController
     if @contributors.nil? || @contributors.empty?
       @contributor = Contributor.create!(@contributor_params)
       @new_contributor = true
+      puts "contributions create: new contributor"
     else
       @contributor = @contributors[0]
     end
@@ -111,6 +114,7 @@ class ContributionsController < ApplicationController
       @contribution = Contribution.new(@contribution_params)
       @contribution.candidate = @candidate
       @contribution.contributor = @contributor
+      puts "contributions create: new contributio #{@contribution_params}"
 
       respond_to do |format|
         if @contribution.save
