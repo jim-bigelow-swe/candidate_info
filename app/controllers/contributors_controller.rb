@@ -3,11 +3,52 @@ class ContributorsController < ApplicationController
   # GET /contributors.json
   def index
     @page_title = "Contributors Listing"
-    @contributors = Contributor.all
+
+    sort = params[:sort] || session[:sort]
+    case sort
+    when 'last'
+      ordering, @last_header =  :last, 'hilite'
+    when 'city'
+      ordering, @city_header =  :city, 'hilite'
+    when 'state'
+      ordering, @state_header = :state, 'hilite'
+    when 'zip'
+      ordering, @zip_header =  :zip, 'hilite'
+    end
+
+
+    if params[:sort] != session[:sort]
+      session[:sort] = sort
+      flash.keep
+      if params[:commit].nil?
+        redirect_to :sort => sort  and return
+      else
+        redirect_to :sort => sort, :commit => params[:commit], :search => params[:search] and return
+      end
+    end
+
+    if params[:commit] =~ /Search/
+      @contributors = Contributor.search params[:search], params[:page], ordering
+    else
+      @contributors = Contributor.paginate(:page => params[:page], :order => ordering)
+    end
+
+    @total_contributions = 0
+    @contribution_amounts = Hash.new
+    if params[:commit] =~ /Search/
+      @total_message = "Total of all contributions selected by #{params[:search]}"
+     contributions =
+      Contribution.connection.select_all(
+     %Q{SELECT contributor_id, contributions.amount FROM contributions
+        INNER JOIN contributors ON contributions.contributor_id = contributors.id
+        WHERE contributors.#{ordering.to_s} like "%#{params[:search]}%"} )
+
+    else
+      @total_message = "Total of all contributions"
+     contributions = Contribution.connection.select_all("SELECT * from contributions")
+    end
 
     #debugger
-    @contribution_amounts = Hash.new
-    contributions = Contribution.connection.select_all("SELECT * from contributions")
     contributions.each do |contribution|
       id = contribution["contributor_id"].to_s
       if @contribution_amounts[id].nil?
@@ -15,7 +56,9 @@ class ContributorsController < ApplicationController
       else
         @contribution_amounts[id] += contribution["amount"].to_f
       end
+      @total_contributions += contribution["amount"].to_f
     end
+
 
     respond_to do |format|
       format.html # index.html.erb

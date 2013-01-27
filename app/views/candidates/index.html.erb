@@ -1,18 +1,26 @@
 <h1>Listing candidates</h1>
 
+<%= form_tag request.path, :method => 'get' do %>
+  <%= content_tag :label do %>
+    Search term:
+    <%= text_field_tag :search, params[:search] %>
+  <% end %>
+  <%= submit_tag 'Search' %>
+<% end %>
+
 <table id="candidates">
   <tr>
     <th>Elected</th>
     <th>Year</th>
-    <th>Last</th>
+    <th class=<%= @last_header %> > <%= link_to "Last", {:controller => "candidates", :action => "index", :sort => 'last'}, :id =>'last_header' %> </th>
     <th>Suffix</th>
     <th>First</th>
     <th>Middle</th>
-    <th>Party</th>
-    <th>District</th>
-    <th>Office</th>
+    <th class=<%= @party_header %> >    <%= link_to "Party",    {:controller => "candidates", :action => "index", :sort => 'party'}, :id =>'party_header' %> </th>
+    <th class=<%= @district_header %> > <%= link_to "District", {:controller => "candidates", :action => "index", :sort => 'district'}, :id =>'district_header' %> </th>
+    <th class=<%= @office_header %> >   <%= link_to "Office",   {:controller => "candidates", :action => "index", :sort => 'office'}, :id =>'office_header' %> </th>
     <th>Total Contributions</th>
-    <th></th>
+    <th>Modify</th>
   </tr>
 
 <% @candidates.each do |candidate| %>
@@ -31,5 +39,12 @@
   </tr>
 <% end %>
 </table>
+<div class="digg_pagination">
+  <div class="page_info">
+     <%= page_entries_info @candidates %>
+  </div>
+  <%= will_paginate @candidates, :container => false %>
+</div>
+
 
 

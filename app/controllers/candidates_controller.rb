@@ -3,7 +3,39 @@ class CandidatesController < ApplicationController
   # GET /candidates.json
   def index
 
-    @candidates = Candidate.all
+    # find a candidate
+    #debugger
+    sort = params[:sort] || session[:sort]
+    case sort
+    when 'last'
+      ordering, @last_header =  :last, 'hilite'
+    when 'party'
+      ordering, @party_header =  :party, 'hilite'
+    when 'district'
+      ordering, @district_header = :district, 'hilite'
+    when 'office'
+      ordering, @office_header =  :office, 'hilite'
+    end
+
+
+    if params[:sort] != session[:sort]
+      session[:sort] = sort
+      flash.keep
+      if params[:commit].nil?
+        redirect_to :sort => sort  and return
+      else
+        redirect_to :sort => sort, :commit => params[:commit], :search => params[:search] and return
+      end
+    end
+
+    if params[:commit] =~ /Search/
+      @candidates = Candidate.search params[:search], params[:page], ordering
+    else
+      @candidates = Candidate.paginate( :page => params[:page], :order => ordering)
+    end
+
+
+    # find the total amount to contributed to each candidate
     @contribution_amounts = Hash.new
     contributions = Candidate.connection.select_all("SELECT * from contributions")
     #debugger
@@ -15,6 +47,7 @@ class CandidatesController < ApplicationController
         @contribution_amounts[id] += contribution["amount"].to_f
       end
     end
+
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: @candidates }

@@ -1,16 +1,27 @@
 <h1>Listing contributors</h1>
 
+<div id='total_contribution'>
+ <%= @total_message %>: <%=  @total_contributions %>
+</div>
+
+<%= form_tag request.path, :method => 'get' do %>
+  <%= content_tag :label do %>
+    Search term:
+    <%= text_field_tag :search, params[:search] %>
+  <% end %>
+  <%= submit_tag 'Search' %>
+<% end %>
+
 <table id='contributors'>
   <tr>
     <th>Type of Contributor</th>
     <th>Contributions</th>
-    <th>Name</th>
-    <th>City</th>
-    <th>State</th>
-    <th>Zip</th>
+    <th class=<%= @last_header %> > <%= link_to "Last", {:controller => "contributors", :action => "index", :sort => 'last'}, :id =>'last_header' %> </th>
+    <th class=<%= @city_header %> > <%= link_to "City", {:controller => "contributors", :action => "index", :sort => 'city'}, :id =>'city_header' %> </th>
+    <th class=<%= @state_header %> > <%= link_to "State", {:controller => "contributors", :action => "index", :sort => 'state'}, :id =>'state_header' %> </th>
+    <th class=<%= @zip_header %> > <%= link_to "Zip", {:controller => "contributors", :action => "index", :sort => 'zip'}, :id =>'zip_header' %> </th>
     <th>Country</th>
-
-    <th></th>
+    <th>Modify</th>
   </tr>
 
 <% @contributors.each do |contributor| %>
@@ -21,9 +32,7 @@
       <%= radio_button("contributor", "kind", "Person", { :checked => (contributor.kind =~ /Person/ ? true : false) } )%>
         <%= f.label "Company" %>
         <%= radio_button("contributor", "kind", "Company", { :checked => (contributor.kind =~ /Company/ ? true : false) }) %>
-        <%= f.label "PAC" %>
-        <%= radio_button("contributor", "kind", "PAC", { :checked => (contributor.kind =~ /PAC/ ? true : false) }) %>
-        <%= f.submit "Update Type", { :class => "contrib_kind_submit" } %>
+        <%= f.submit "Update", { :class => "contrib_kind_submit" } %>
      <% end %>
     </td>
     <td><%= link_to  @contribution_amounts[contributor.id.to_s].to_f, {:controller => "contributors", :action => "show", :id => contributor.id}, :class => "list_contribs" %></td>
@@ -36,4 +45,10 @@
   </tr>
 <% end %>
 </table>
+<div class="digg_pagination">
+  <div class="page_info">
+     <%= page_entries_info @contributors %>
+  </div>
+  <%= will_paginate @contributors, :container => false %>
+</div>
 

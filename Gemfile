@@ -35,6 +35,8 @@ group :test do
   gem 'guard-rspec'
 end
 
+gem 'will_paginate'
+
 gem "levenshtein-ffi", :require => 'levenshtein'
 
 gem 'haml'
