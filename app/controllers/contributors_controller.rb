@@ -41,7 +41,7 @@ class ContributorsController < ApplicationController
       Contribution.connection.select_all(
      %Q{SELECT contributor_id, contributions.amount FROM contributions
         INNER JOIN contributors ON contributions.contributor_id = contributors.id
-        WHERE contributors.#{ordering.to_s} like "%#{params[:search]}%"} )
+        WHERE contributors.#{ordering.to_s} LIKE '%#{params[:search]}%'} )
 
     else
       @total_message = "Total of all contributions"
