@@ -57,7 +57,7 @@
   </ul>
 <p>
   <b>Total Contributions</b>
-  <%= @contribution_total %>
+  <%= (@contribution_total) %>
 </p>
 
 <table>
@@ -73,7 +73,7 @@
   <tr>
     <td><%= link_to contribution["candidate"], :controller => "candidates", :action => "show", :id => contribution["candidate_id"] %></td>
     <td><%= contribution["date"] %></td>
-    <td><%= link_to contribution["amount"], :controller => "contributions", :action => "show", :id => contribution["id"] %></td>
+    <td><%= link_to (contribution["amount"].to_f / 100), :controller => "contributions", :action => "show", :id => contribution["id"] %></td>
     <td><%= contribution["contribution_type"] %></td>
     <td><%= link_to 'Show', :controller => "contributions", :action => "show", :id => contribution["id"] %></td>
   </tr>

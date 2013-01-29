@@ -4,8 +4,11 @@ class ContributorsController < ApplicationController
   def index
     @page_title = "Contributors Listing"
 
+    #debugger
     sort = params[:sort] || session[:sort]
     case sort
+    when 'contributions'
+      ordering, @contributions_header = :total, 'hilite'
     when 'last'
       ordering, @last_header =  :last, 'hilite'
     when 'city'
@@ -14,6 +17,9 @@ class ContributorsController < ApplicationController
       ordering, @state_header = :state, 'hilite'
     when 'zip'
       ordering, @zip_header =  :zip, 'hilite'
+    end
+    if ordering.nil?
+      ordering = :last
     end
 
 
@@ -28,37 +34,15 @@ class ContributorsController < ApplicationController
     end
 
     if params[:commit] =~ /Search/
+      #debugger
       @contributors = Contributor.search params[:search], params[:page], ordering
+      @total_message = "Total of all contributions selected by #{params[:search]}"
+      @total_contributions = Contribution.get_contributor_subtotal ordering, params[:search]
     else
       @contributors = Contributor.paginate(:page => params[:page], :order => ordering)
-    end
-
-    @total_contributions = 0
-    @contribution_amounts = Hash.new
-    if params[:commit] =~ /Search/
-      @total_message = "Total of all contributions selected by #{params[:search]}"
-     contributions =
-      Contribution.connection.select_all(
-     %Q{SELECT contributor_id, contributions.amount FROM contributions
-        INNER JOIN contributors ON contributions.contributor_id = contributors.id
-        WHERE contributors.#{ordering.to_s} LIKE '%#{params[:search]}%'} )
-
-    else
       @total_message = "Total of all contributions"
-     contributions = Contribution.connection.select_all("SELECT * from contributions")
+      @total_contributions = Contribution.get_total_amount
     end
-
-    #debugger
-    contributions.each do |contribution|
-      id = contribution["contributor_id"].to_s
-      if @contribution_amounts[id].nil?
-        @contribution_amounts[id] = contribution["amount"].to_f
-      else
-        @contribution_amounts[id] += contribution["amount"].to_f
-      end
-      @total_contributions += contribution["amount"].to_f
-    end
-
 
     respond_to do |format|
       format.html # index.html.erb
@@ -71,20 +55,8 @@ class ContributorsController < ApplicationController
   def show
     @page_title = "Contributor Information"
     @contributor = Contributor.find(params[:id])
-
-    @contribution_totals = Contribution.connection.select_all(
-       "SELECT SUM(contributions.amount) as contribution_total
-        FROM contributions
-        WHERE contributor_id = #{params[:id].to_i}" )
-    @contribution_total = @contribution_totals[0]["contribution_total"]
-
-    @contributions = Contribution.connection.select_all(
-       "SELECT candidates.last as candidate, contributions.*
-        FROM contributions
-        INNER JOIN candidates ON contributions.candidate_id = candidates.id
-        WHERE contributions.contributor_id = #{params[:id].to_i}" )
-
-
+    @contribution_total = Contribution.get_contributor_total params[:id]
+    @contributions = Contribution.get_contributor_contributions params[:id]
 
     respond_to do |format|
       format.html # show.html.erb

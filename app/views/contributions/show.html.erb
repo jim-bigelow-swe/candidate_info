@@ -17,7 +17,7 @@
 
 <p>
   <b>Amount:</b>
-  <%= @contribution["amount"] %>
+  <%= (@contribution["amount"].to_f / 100) %>
 </p>
 
 <p>

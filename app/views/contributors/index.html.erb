@@ -15,7 +15,7 @@
 <table id='contributors'>
   <tr>
     <th>Type of Contributor</th>
-    <th>Contributions</th>
+    <th class=<%= @contributions_header %> > <%= link_to "Contributions", {:controller => "contributors", :action => "index", :sort => 'contributions'}, :id =>'contributions_header' %> </th>
     <th class=<%= @last_header %> > <%= link_to "Last", {:controller => "contributors", :action => "index", :sort => 'last'}, :id =>'last_header' %> </th>
     <th class=<%= @city_header %> > <%= link_to "City", {:controller => "contributors", :action => "index", :sort => 'city'}, :id =>'city_header' %> </th>
     <th class=<%= @state_header %> > <%= link_to "State", {:controller => "contributors", :action => "index", :sort => 'state'}, :id =>'state_header' %> </th>
@@ -35,7 +35,7 @@
         <%= f.submit "Update", { :class => "contrib_kind_submit" } %>
      <% end %>
     </td>
-    <td><%= link_to  @contribution_amounts[contributor.id.to_s].to_f, {:controller => "contributors", :action => "show", :id => contributor.id}, :class => "list_contribs" %></td>
+    <td><%= link_to ( contributor.total.to_f / 100 ), {:controller => "contributors", :action => "show", :id => contributor.id}, :class => "list_contribs" %></td>
     <td><%= link_to ( contributor.kind =~ /Person/ ? "#{contributor.first} #{contributor.middle} #{contributor.last}"  : contributor.last ), contributor, :class => 'update_contributor' %></td>
     <td><%= contributor.city %></td>
     <td><%= contributor.state %></td>

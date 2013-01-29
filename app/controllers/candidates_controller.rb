@@ -1,10 +1,11 @@
 class CandidatesController < ApplicationController
+
+
   # GET /candidates
   # GET /candidates.json
   def index
 
-    # find a candidate
-    #debugger
+    # find candidates
     sort = params[:sort] || session[:sort]
     case sort
     when 'last'
@@ -15,6 +16,8 @@ class CandidatesController < ApplicationController
       ordering, @district_header = :district, 'hilite'
     when 'office'
       ordering, @office_header =  :office, 'hilite'
+    when 'total'
+      ordering, @totalheader =  :total, 'hilite'
     end
 
 
@@ -28,24 +31,15 @@ class CandidatesController < ApplicationController
       end
     end
 
+    #debugger
     if params[:commit] =~ /Search/
       @candidates = Candidate.search params[:search], params[:page], ordering
+      @total_message = "Total of all contributions selected by #{params[:search]}"
+      @total_contributions = Contribution.get_candidate_subtotal(ordering, params[:search])
     else
       @candidates = Candidate.paginate( :page => params[:page], :order => ordering)
-    end
-
-
-    # find the total amount to contributed to each candidate
-    @contribution_amounts = Hash.new
-    contributions = Candidate.connection.select_all("SELECT * from contributions")
-    #debugger
-    contributions.each do |contribution|
-      id = contribution["candidate_id"].to_s
-      if @contribution_amounts[id].nil?
-        @contribution_amounts[id] = contribution["amount"].to_f
-      else
-        @contribution_amounts[id] += contribution["amount"].to_f
-      end
+      @total_message = "Total of all contributions"
+      @total_contributions = Contribution.get_total_amount
     end
 
     respond_to do |format|
@@ -60,18 +54,8 @@ class CandidatesController < ApplicationController
     @page_title = "Candidate Information"
     #debugger
     @candidate = Candidate.find(params[:id])
-
-    @contribution_totals = Contribution.connection.select_all(
-       "SELECT SUM(contributions.amount) as contribution_total
-        FROM contributions
-        WHERE candidate_id = #{params[:id].to_i}" )
-    @contribution_total = @contribution_totals[0]["contribution_total"]
-
-    @contributions = Contribution.connection.select_all(
-       "SELECT contributors.last as contributor, contributions.*
-        FROM contributions
-        INNER JOIN contributors ON contributions.contributor_id = contributors.id
-        WHERE contributions.candidate_id = #{params[:id].to_i}" )
+    @contribution_total = Contribution.get_candidate_total params[:id]
+    @contributions = Contribution.get_candidate_contributions params[:id]
 
     render :partial => 'list_contributions', :object => @contributions and return if request.xhr?
 

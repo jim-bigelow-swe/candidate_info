@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130110225050) do
+ActiveRecord::Schema.define(:version => 20130129024833) do
 
   create_table "candidates", :force => true do |t|
     t.boolean  "elected",    :default => false
@@ -25,6 +25,7 @@ ActiveRecord::Schema.define(:version => 20130110225050) do
     t.string   "office"
     t.datetime "created_at",                    :null => false
     t.datetime "updated_at",                    :null => false
+    t.integer  "total",      :default => 0
   end
 
   create_table "contributions", :force => true do |t|
@@ -49,11 +50,12 @@ ActiveRecord::Schema.define(:version => 20130110225050) do
     t.string   "city"
     t.string   "state"
     t.string   "zip"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",                :null => false
+    t.datetime "updated_at",                :null => false
     t.string   "kind"
     t.string   "mailing2"
     t.string   "country"
+    t.integer  "total",      :default => 0
   end
 
 end

@@ -4,14 +4,7 @@ class ContributionsController < ApplicationController
   def index
     #debugger
     @page_title = "All Contributions"
-    @contributions =
-      Contribution.connection.select_all(
-       "SELECT candidates.last as candidate, candidates.elected,
-        contributors.last as contributor,
-        contributions.*
-        FROM contributions
-        INNER JOIN candidates ON contributions.candidate_id = candidates.id
-        INNER JOIN contributors ON contributors.id = contributions.contributor_id")
+    @contributions = Contributions.get_all_contributions
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: @contributions }
@@ -23,15 +16,7 @@ class ContributionsController < ApplicationController
   def show
     #debugger
     @page_title = "Contribution Information"
-    id = params[:id].to_i
-    data_set =   Contribution.connection.select_all(
-       "SELECT candidates.last as candidate, contributors.last as contributor,
-        contributions.*
-        FROM contributions
-        INNER JOIN candidates ON contributions.candidate_id = candidates.id
-        INNER JOIN contributors ON contributors.id = contributions.contributor_id
-        WHERE contributions.id = #{id} " )
-    @contribution = data_set[0] #Contribution.find(params[:id])
+    @contribution = Contribution.get_contribution_details params[:id].to_i
 
     respond_to do |format|
       format.html # show.html.erb
@@ -66,7 +51,7 @@ class ContributionsController < ApplicationController
       render(:nothing => true) and return
     end
     @candidate_params =  attr[:candidates_attributes]
-    puts "contributions create: candidate #{@candidate_params}"
+    #puts "contributions create: candidate #{@candidate_params}"
 
     attr = @contribution_params.delete :contributors_attributes
     if attr.nil?
@@ -80,7 +65,7 @@ class ContributionsController < ApplicationController
     if @candidates.nil? || @candidates.empty?
       @candidate = Candidate.create!(@candidate_params)
       @new_candidate = true
-      puts "contributions create: new candidate"
+      #puts "contributions create: new candidate"
     else
       @candidate = @candidates[0]
     end
@@ -90,7 +75,7 @@ class ContributionsController < ApplicationController
     if @contributors.nil? || @contributors.empty?
       @contributor = Contributor.create!(@contributor_params)
       @new_contributor = true
-      puts "contributions create: new contributor"
+      #puts "contributions create: new contributor"
     else
       @contributor = @contributors[0]
     end
@@ -114,7 +99,13 @@ class ContributionsController < ApplicationController
       @contribution = Contribution.new(@contribution_params)
       @contribution.candidate = @candidate
       @contribution.contributor = @contributor
-      puts "contributions create: new contributio #{@contribution_params}"
+
+      #puts "contributions create: new contributio #{@contribution_params}"
+
+      @candidate.total += @contribution.amount
+      @candidate.save
+      @contributor.total += @contribution.amount
+      @contributor.save
 
       respond_to do |format|
         if @contribution.save

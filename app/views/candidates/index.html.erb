@@ -1,5 +1,9 @@
 <h1>Listing candidates</h1>
 
+<div id='total_contribution'>
+ <%= @total_message %>: <%=  @total_contributions %>
+</div>
+
 <%= form_tag request.path, :method => 'get' do %>
   <%= content_tag :label do %>
     Search term:
@@ -19,7 +23,7 @@
     <th class=<%= @party_header %> >    <%= link_to "Party",    {:controller => "candidates", :action => "index", :sort => 'party'}, :id =>'party_header' %> </th>
     <th class=<%= @district_header %> > <%= link_to "District", {:controller => "candidates", :action => "index", :sort => 'district'}, :id =>'district_header' %> </th>
     <th class=<%= @office_header %> >   <%= link_to "Office",   {:controller => "candidates", :action => "index", :sort => 'office'}, :id =>'office_header' %> </th>
-    <th>Total Contributions</th>
+    <th class=<%= @total_header %> >    <%= link_to "Total Contributions",  {:controller => "candidates", :action => "index", :sort => 'total'}, :id =>'total_header' %> </th>
     <th>Modify</th>
   </tr>
 
@@ -34,7 +38,7 @@
     <td><%= candidate.party %></td>
     <td><%= candidate.district %></td>
     <td><%= candidate.office %></td>
-    <td><%= link_to  @contribution_amounts[candidate.id.to_s].to_f, {:controller => "candidates", :action => "show", :id => candidate.id}, :class => "list_contribs" %></td>
+    <td><%= link_to  (candidate.total.to_f / 100), {:controller => "candidates", :action => "show", :id => candidate.id}, :class => "list_contribs" %></td>
     <td><%= link_to 'Edit', edit_candidate_path(candidate) %></td>
   </tr>
 <% end %>

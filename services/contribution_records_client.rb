@@ -9,8 +9,11 @@ require 'optparse'
 require 'active_resource'
 
 class Contribution < ActiveResource::Base
-  #self.site = "http://localhost:3000"
-  self.site = "http://immense-forest-6797.herokuapp.com/"
+  self.site = "http://localhost:3000"
+  #self.site = "http://immense-forest-6797.herokuapp.com/"
+  def self.show_site
+    self.site
+  end
 end
 
 
@@ -52,6 +55,8 @@ end
 optparse.parse!
 
 puts "Being verbose" if options[:verbose]
+
+puts "\n\n**\n* Creating contribution records at #{Contribution.show_site}\n**\n\n"
 
 legislators = Hash.new
 line_number = 0
@@ -159,10 +164,11 @@ ARGV.each do|f|
         fields = record.chomp.split("\t")
         date_fields = fields[8].split("/")
         contrib_date = Date.parse("#{date_fields[2]}-#{date_fields[0]}-#{date_fields[1]}").to_formatted_s(:db)
+        contrib_amount = (fields[9].tr('",', '').to_f * 100).to_i
         candidate_was_elected = legislators[fields[0]].nil? ? false : true
         contribution_params = {
           :date              => contrib_date,
-          :amount            => fields[9].tr('",', ''),
+          :amount            => contrib_amount,
           :contribution_type => fields[7],
           :candidates_attributes => {
             :year     => "2012-09-13",

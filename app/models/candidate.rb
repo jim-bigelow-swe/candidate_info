@@ -6,8 +6,9 @@ class Candidate < ActiveRecord::Base
   self.per_page = 15
 
   def self.search(search, page, ordering)
-  paginate :per_page => self.per_page, :page => page,
-           :conditions => [ordering.to_s + ' like ?', "%#{search}%"], :order => ordering
+    paginate :per_page => self.per_page, :page => page,
+    :conditions => [ordering.to_s + ' like ?', "%#{search}%"],
+    :order => ordering
   end
 
 end
