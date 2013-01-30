@@ -4,9 +4,10 @@ class Contribution < ActiveRecord::Base
   attr_accessible :amount, :contribution_type, :date, :candidate_id, :contributor_id
 
   def self.get_total_amount
-    contributions = Contribution.connection.select_all("SELECT SUM(amount) from contributions")
+    contributions = Contribution.connection.select_all("SELECT SUM(amount) as total from contributions")
+    puts "Contribution.get_total_amount: contributions"
     amount = contributions[0]
-    amount["SUM(amount)"]
+    amount["total"]
   end
 
   def self.get_candidate_subtotal(column_name, search)
