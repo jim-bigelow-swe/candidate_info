@@ -1,7 +1,7 @@
 <h1>Listing contributors</h1>
 
 <div id='total_contribution'>
- <%= @total_message %>: <%=  @total_contributions %>
+ <%= @total_message %>: <%=  @total_contributions.to_f/100 %>
 </div>
 
 <%= form_tag request.path, :method => 'get' do %>

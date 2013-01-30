@@ -5,28 +5,28 @@ class Contribution < ActiveRecord::Base
 
   def self.get_total_amount
     contributions = Contribution.connection.select_all("SELECT SUM(amount) as total from contributions")
-    puts "Contribution.get_total_amount: contributions"
+    #puts "Contribution.get_total_amount: #{contributions}"
     amount = contributions[0]
     amount["total"]
   end
 
   def self.get_candidate_subtotal(column_name, search)
     contributions = Contribution.connection.select_all(
-     %Q{SELECT SUM(amount) FROM contributions
+     %Q{SELECT SUM(amount) as total FROM contributions
         INNER JOIN candidates ON contributions.candidate_id = candidates.id
         WHERE candidates.#{column_name} LIKE '%#{search}%'} )
     amount = contributions[0]
-    amount["SUM(amount)"]
+    amount["total"]
   end
 
   def self.get_contributor_subtotal(column_name, search)
     contributions =
       Contribution.connection.select_all(
-     %Q{SELECT SUM(amount) FROM contributions
+     %Q{SELECT SUM(amount) as total FROM contributions
         INNER JOIN contributors ON contributions.contributor_id = contributors.id
         WHERE contributors.#{column_name.to_s} LIKE '%#{search}%'} )
     amount = contributions[0]
-    amount["SUM(amount)"]
+    amount["total"]
   end
 
 
