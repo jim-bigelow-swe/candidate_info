@@ -9,8 +9,8 @@ require 'optparse'
 require 'active_resource'
 
 class Contribution < ActiveResource::Base
-  self.site = "http://localhost:3000"
-  #self.site = "http://immense-forest-6797.herokuapp.com/"
+  #self.site = "http://localhost:3000"
+  self.site = "http://immense-forest-6797.herokuapp.com/"
   def self.show_site
     self.site
   end

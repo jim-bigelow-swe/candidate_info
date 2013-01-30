@@ -6,7 +6,7 @@ class Contribution < ActiveRecord::Base
   def self.get_total_amount
     contributions = Contribution.connection.select_all("SELECT SUM(amount) from contributions")
     amount = contributions[0]
-    amount["SUM(amount)"].to_f / 100
+    amount["SUM(amount)"]
   end
 
   def self.get_candidate_subtotal(column_name, search)
@@ -15,7 +15,7 @@ class Contribution < ActiveRecord::Base
         INNER JOIN candidates ON contributions.candidate_id = candidates.id
         WHERE candidates.#{column_name} LIKE '%#{search}%'} )
     amount = contributions[0]
-    amount["SUM(amount)"].to_f / 100
+    amount["SUM(amount)"]
   end
 
   def self.get_contributor_subtotal(column_name, search)
@@ -25,7 +25,7 @@ class Contribution < ActiveRecord::Base
         INNER JOIN contributors ON contributions.contributor_id = contributors.id
         WHERE contributors.#{column_name.to_s} LIKE '%#{search}%'} )
     amount = contributions[0]
-    amount["SUM(amount)"].to_f / 100
+    amount["SUM(amount)"]
   end
 
 
@@ -34,7 +34,7 @@ class Contribution < ActiveRecord::Base
      %Q{SELECT SUM(contributions.amount) as contribution_total
         FROM contributions
         WHERE candidate_id = '#{id.to_i}'} )
-    (contribution_totals[0]["contribution_total"]).to_f / 100
+    (contribution_totals[0]["contribution_total"])
   end
 
   def self.get_candidate_contributions(id)
