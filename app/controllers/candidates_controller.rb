@@ -4,42 +4,70 @@ class CandidatesController < ApplicationController
   # GET /candidates
   # GET /candidates.json
   def index
-
     # find candidates
     sort = params[:sort] || session[:sort]
     case sort
     when 'last'
-      ordering, @last_header =  :last, 'hilite'
+      ordering, @last_header     = :last, 'hilite'
     when 'party'
-      ordering, @party_header =  :party, 'hilite'
+      ordering, @party_header    = :party, 'hilite'
     when 'district'
       ordering, @district_header = :district, 'hilite'
     when 'office'
-      ordering, @office_header =  :office, 'hilite'
+      ordering, @office_header   = :office, 'hilite'
     when 'total'
-      ordering, @totalheader =  :total, 'hilite'
+      ordering, @total_header    = :total, 'hilite'
     end
-
 
     if params[:sort] != session[:sort]
       session[:sort] = sort
       flash.keep
       if params[:commit].nil?
         redirect_to :sort => sort  and return
+      elsif params[:commit] =~ /Filter/
+        redirect_to :elected => params[:elected], :commit => params[:commit], :sort => sort and return
       else
         redirect_to :sort => sort, :commit => params[:commit], :search => params[:search] and return
       end
     end
 
+
+    if params[:commit] =~ /Filter/ && params[:elected].nil? && !session[:elected].nil?
+      # user unchecked the filter on elected button, removed elected from session
+      session.delete(:elected)
+      filter = nil
+    elsif params[:commit] =~ /Filter/ && !params[:elected].nil? && session[:elected].nil?
+      # remember the user checked the filter on elected
+      session[:elected] = params[:elected]
+      filter = params[:elected]
+    elsif !(params[:commit] =~ /Filter/) && params[:elected].nil? && !session[:elected].nil?
+      # use the value from session by adding the value to the params list
+      params[:elected] = session[:elected]
+      redirect_to params and return
+    else
+      filter = params[:elected]
+    end
+    @elected_checked = filter != nil ? true : false
+
     #debugger
     if params[:commit] =~ /Search/
-      @candidates = Candidate.search params[:search], params[:page], ordering
+      @candidates = Candidate.search params[:search], params[:page], ordering, filter
+      @contributor_mix = Contribution.find_contrib_mix_per_candidate_range params[:search], params[:page], ordering, filter
+
+      # for total_contributions partial
       @total_message = "Total of all contributions selected by #{params[:search]}"
-      @total_contributions = Contribution.get_candidate_subtotal(ordering, params[:search])
+      @total_contributions = Contribution.get_candidate_subtotal(ordering, params[:search], filter)
+      @contribution_mix = Contribution.get_candidate_contributions_composition_by_selection ordering, params[:search], filter
+      @contributor_counts = Contributor.get_candidate_contributor_makeup_by_selection ordering, params[:search], filter
     else
-      @candidates = Candidate.paginate( :page => params[:page], :order => ordering)
+      @candidates = Candidate.page(params[:page], ordering, filter)
+      @contributor_mix = Contribution.find_contrib_mix_per_candidate params[:page], ordering, filter
+
+      # for total_contributions partial
       @total_message = "Total of all contributions"
-      @total_contributions = Contribution.get_total_amount
+      @total_contributions = Contribution.get_total_amount filter
+      @contribution_mix = Contribution.get_contributions_composition filter
+      @contributor_counts = Contributor.get_contributor_makeup filter
     end
 
     respond_to do |format|
@@ -56,6 +84,14 @@ class CandidatesController < ApplicationController
     @candidate = Candidate.find(params[:id])
     @contribution_total = Contribution.get_candidate_total params[:id]
     @contributions = Contribution.get_candidate_contributions params[:id]
+
+    @company_contributions = 0
+    @personal_contributions = 0
+    @contributions.each do |contrib|
+      @company_contributions += contrib["amount"] if contrib["kind"] == "Company"
+      @personal_contributions += contrib["amount"] if contrib["kind"] == "Person"
+    end
+
 
     render :partial => 'list_contributions', :object => @contributions and return if request.xhr?
 

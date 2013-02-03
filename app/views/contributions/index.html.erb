@@ -19,7 +19,7 @@
     <td><%= contribution["date"] %></td>
     <td><%= (contribution["amount"].to_f / 100) %></td>
     <td><%= contribution["contribution_type"] %></td>
-    <td><%= link_to 'Show', :controller => "contributions", :action => "show", :id => contribution["id"] %></td>
+    <td><%= link_to 'Details', :controller => "contributions", :action => "show", :id => contribution["id"] %></td>
   </tr>
 <% end %>
 </table>

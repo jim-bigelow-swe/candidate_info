@@ -2,11 +2,11 @@
 CANDINFO = {
     setup: function() {
         // construct new DOM elements
-        $('<label for="filter" class="explanation">' +
-          'Restrict to elected officials' +
-          '</label>' +
-          '<input type="checkbox" id="filter"/>'
-         ).insertBefore('#candidates').change(CANDINFO.filter_not_elected);
+        //$('<label for="filter" class="explanation">' +
+        //  'Restrict to elected officials' +
+        //  '</label>' +
+        //  '<input type="checkbox" id="filter"/>'
+        // ).insertBefore('#candidates').change(CANDINFO.filter_not_elected);
         // add invisible 'div' to end of page:
         $('<div id="contributionInfo"></div>').
             hide().

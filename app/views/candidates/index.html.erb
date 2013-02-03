@@ -1,9 +1,8 @@
 <h1>Listing candidates</h1>
 
-<div id='total_contribution'>
- <%= @total_message %>: <%=  @total_contributions.to_f/100 %>
-</div>
+<%= render "shared/total_contributions" %>
 
+<div id="search">
 <%= form_tag request.path, :method => 'get' do %>
   <%= content_tag :label do %>
     Search term:
@@ -11,20 +10,31 @@
   <% end %>
   <%= submit_tag 'Search' %>
 <% end %>
+<%= form_tag request.path, :method => 'get' do %>
+  <%= content_tag :label do %>
+   Restrict to elected officials
+  <% end %>
+  <%= check_box_tag 'elected', '1', :checked => @elected_checked  %>
+  <%= submit_tag 'Filter' %>
+<% end %>
+</div>
 
 <table id="candidates">
+  <tr><th colspan=9></th><th colspan=3>Contributions</th> </tr>
   <tr>
     <th>Elected</th>
     <th>Year</th>
-    <th class=<%= @last_header %> > <%= link_to "Last", {:controller => "candidates", :action => "index", :sort => 'last'}, :id =>'last_header' %> </th>
+    <th class=<%= @last_header %> >     <%= link_to "Last",     {:controller => "candidates", :action => "index", :sort => 'last'}, :id =>'last_header' %> </th>
     <th>Suffix</th>
     <th>First</th>
     <th>Middle</th>
     <th class=<%= @party_header %> >    <%= link_to "Party",    {:controller => "candidates", :action => "index", :sort => 'party'}, :id =>'party_header' %> </th>
     <th class=<%= @district_header %> > <%= link_to "District", {:controller => "candidates", :action => "index", :sort => 'district'}, :id =>'district_header' %> </th>
     <th class=<%= @office_header %> >   <%= link_to "Office",   {:controller => "candidates", :action => "index", :sort => 'office'}, :id =>'office_header' %> </th>
-    <th class=<%= @total_header %> >    <%= link_to "Total Contributions",  {:controller => "candidates", :action => "index", :sort => 'total'}, :id =>'total_header' %> </th>
-    <th>Modify</th>
+    <th class=<%= @total_header %> >    <%= link_to "Total",    {:controller => "candidates", :action => "index", :sort => 'total'}, :id =>'total_header' %> </th>
+    <th>No.</th>
+    <th>by Company</th>
+    <th>by Person</th>
   </tr>
 
 <% @candidates.each do |candidate| %>
@@ -39,7 +49,10 @@
     <td><%= candidate.district %></td>
     <td><%= candidate.office %></td>
     <td><%= link_to  (candidate.total.to_f / 100), {:controller => "candidates", :action => "show", :id => candidate.id}, :class => "list_contribs" %></td>
-    <td><%= link_to 'Edit', edit_candidate_path(candidate) %></td>
+    <% index = @contributor_mix.index{|x| x["id"] ==  candidate.id} %>
+    <td><%= index.nil? ? 0 : @contributor_mix[index]["total"] %>
+    <td><%= index.nil? ? 0 : @contributor_mix[index]["company"].nil? ? 0 :  @contributor_mix[index]["company"].to_f/100 %>
+    <td><%= index.nil? ? 0 : @contributor_mix[index]["person"].nil? ? 0 : @contributor_mix[index]["person"].to_f/100 %>
   </tr>
 <% end %>
 </table>

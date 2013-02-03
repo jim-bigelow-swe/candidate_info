@@ -1,8 +1,6 @@
 <h1>Listing contributors</h1>
 
-<div id='total_contribution'>
- <%= @total_message %>: <%=  @total_contributions.to_f/100 %>
-</div>
+<%= render "shared/total_contributions" %>
 
 <%= form_tag request.path, :method => 'get' do %>
   <%= content_tag :label do %>

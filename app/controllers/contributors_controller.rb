@@ -35,13 +35,17 @@ class ContributorsController < ApplicationController
 
     if params[:commit] =~ /Search/
       #debugger
-      @contributors = Contributor.search params[:search], params[:page], ordering
       @total_message = "Total of all contributions selected by #{params[:search]}"
+      @contributors = Contributor.search params[:search], params[:page], ordering
       @total_contributions = Contribution.get_contributor_subtotal ordering, params[:search]
+      @contribution_mix = Contribution.get_contributions_composition_by_selection ordering, params[:search]
+      @contributor_counts = Contributor.get_contributor_makeup_by_selection ordering, params[:search]
     else
-      @contributors = Contributor.paginate(:page => params[:page], :order => ordering)
       @total_message = "Total of all contributions"
+      @contributors = Contributor.paginate(:page => params[:page], :order => ordering)
       @total_contributions = Contribution.get_total_amount
+      @contribution_mix = Contribution.get_contributions_composition
+      @contributor_counts = Contributor.get_contributor_makeup
     end
 
     respond_to do |format|
