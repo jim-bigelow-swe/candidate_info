@@ -4,7 +4,7 @@ class ContributionsController < ApplicationController
   def index
     #debugger
     @page_title = "All Contributions"
-    @contributions = Contribution.get_all_contributions
+    @contributions = Contribution.get_all_contributions (session[:elected].nil?  ? false : true)
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: @contributions }

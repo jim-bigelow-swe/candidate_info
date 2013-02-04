@@ -202,7 +202,8 @@ class Contribution < ActiveRecord::Base
       FROM candidates
       }
     select_clause << %Q{ WHERE elected = 't' } if filter != nil
-    select_clause << %Q{ ORDER BY candidates.#{column_name.to_s} LIMIT #{page_size} OFFSET #{offset}}
+    select_clause << %Q{ ORDER BY candidates.#{column_name.to_s} } if !column_name.nil?
+    select_clause << %Q{ LIMIT #{page_size} OFFSET #{offset}}
 
     Contribution.connection.select_all(select_clause)
   end

@@ -37,15 +37,20 @@ class ContributorsController < ApplicationController
       #debugger
       @total_message = "Total of all contributions selected by #{params[:search]}"
       @contributors = Contributor.search params[:search], params[:page], ordering
+
       @total_contributions = Contribution.get_contributor_subtotal ordering, params[:search]
       @contribution_mix = Contribution.get_contributions_composition_by_selection ordering, params[:search]
       @contributor_counts = Contributor.get_contributor_makeup_by_selection ordering, params[:search]
     else
-      @total_message = "Total of all contributions"
+      if session[:elected].nil?
+        @total_message = "Total of all contributions"
+      else
+        @total_message = "Total of all contributions to elected candidates"
+      end
       @contributors = Contributor.paginate(:page => params[:page], :order => ordering)
-      @total_contributions = Contribution.get_total_amount
-      @contribution_mix = Contribution.get_contributions_composition
-      @contributor_counts = Contributor.get_contributor_makeup
+      @total_contributions = Contribution.get_total_amount (session[:elected].nil?  ? false : true)
+      @contribution_mix = Contribution.get_contributions_composition (session[:elected].nil?  ? false : true)
+      @contributor_counts = Contributor.get_contributor_makeup (session[:elected].nil?  ? false : true)
     end
 
     respond_to do |format|
