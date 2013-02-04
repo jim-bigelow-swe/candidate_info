@@ -55,11 +55,23 @@ class Contribution < ActiveRecord::Base
 
   def self.get_candidate_total(id)
     contribution_totals = Contribution.connection.select_all(
-     %Q{SELECT SUM(contributions.amount) as contribution_total
+     %Q{SELECT
+          SUM(contributions.amount) as total,
+          (SELECT COUNT(contributor_id)
+             FROM contributions
+             WHERE candidate_id = #{id.to_i}) as contributors,
+         (SELECT SUM(amount)
+            FROM contributions
+            JOIN contributors ON contributors.id = contributions.contributor_id
+            WHERE candidate_id = #{id.to_i} AND contributors.kind = 'Company' ) as company,
+         (SELECT SUM(amount)
+            FROM contributions
+            JOIN contributors ON contributors.id = contributions.contributor_id
+            WHERE candidate_id = #{id.to_i} AND contributors.kind = 'Person' ) as person
         FROM contributions
         WHERE candidate_id = '#{id.to_i}'} )
-    (contribution_totals[0]["contribution_total"])
   end
+
 
   def self.get_candidate_contributions(id)
     Contribution.connection.select_all(

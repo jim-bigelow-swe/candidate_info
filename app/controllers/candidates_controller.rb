@@ -82,16 +82,15 @@ class CandidatesController < ApplicationController
     @page_title = "Candidate Information"
     #debugger
     @candidate = Candidate.find(params[:id])
-    @contribution_total = Contribution.get_candidate_total params[:id]
+    puts "candidates/#{params[:id]}: #{@candidate.last}"
+    @contribution_mix = Contribution.get_candidate_total params[:id]
+    @contribution_total = @contribution_mix[0]["total"]
+    @contributor_number = @contribution_mix[0]["contributors"]
+    @company_contributions = @contribution_mix[0]["company"]
+    @personal_contributions = @contribution_mix[0]["person"]
+    puts "candidates/#{params[:id]}: total #{@contribution_total}"
+
     @contributions = Contribution.get_candidate_contributions params[:id]
-
-    @company_contributions = 0
-    @personal_contributions = 0
-    @contributions.each do |contrib|
-      @company_contributions += contrib["amount"] if contrib["kind"] == "Company"
-      @personal_contributions += contrib["amount"] if contrib["kind"] == "Person"
-    end
-
 
     render :partial => 'list_contributions', :object => @contributions and return if request.xhr?
 
