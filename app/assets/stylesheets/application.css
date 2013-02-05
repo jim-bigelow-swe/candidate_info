@@ -18,6 +18,10 @@
   background: wheat;
 }
 
+a.broken_link {
+ color: red;
+ text-decoration: line-through;
+}
 
 .digg_pagination {
   background: white;
