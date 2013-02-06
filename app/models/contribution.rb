@@ -190,14 +190,8 @@ class Contribution < ActiveRecord::Base
     Contribution.connection.select_all(select_clause)
   end
 
-  def self.find_contrib_mix_per_candidate( page, column_name, filter )
+  def self.find_contrib_mix_per_candidate(filter )
     # returns the candidate, # of contributors, $ company, $ person
-    page_size = Candidate.get_page_size
-    if page.nil?
-      offset = 0
-    else
-      offset = page_size * (page.to_i - 1)
-    end
     select_clause = %Q{
       SELECT candidates.id, candidates.last,
         (SELECT COUNT(contributor_id)
@@ -214,37 +208,6 @@ class Contribution < ActiveRecord::Base
       FROM candidates
       }
     select_clause << %Q{ WHERE elected = 't' } if filter != nil
-    select_clause << %Q{ ORDER BY candidates.#{column_name.to_s} } if !column_name.nil?
-    select_clause << %Q{ LIMIT #{page_size} OFFSET #{offset}}
-
-    Contribution.connection.select_all(select_clause)
-  end
-
-  def self.find_contrib_mix_per_candidate_range(search, page, column_name,filter)
-    page_size = Candidate.get_page_size
-    if page.nil?
-      offset = 0
-    else
-      offset = page_size * (page.to_i - 1)
-    end
-    select_clause = %Q{
-      SELECT candidates.id, candidates.last,
-        (SELECT COUNT(contributor_id)
-           FROM contributions
-           WHERE candidate_id = candidates.id) as total,
-        (SELECT SUM(amount)
-           FROM contributions
-           JOIN contributors ON contributors.id = contributions.contributor_id
-           WHERE candidate_id = candidates.id AND contributors.kind = 'Company' ) as company,
-        (SELECT SUM(amount)
-           FROM contributions
-           JOIN contributors ON contributors.id = contributions.contributor_id
-           WHERE candidate_id = candidates.id AND contributors.kind = 'Person' ) as person
-      FROM candidates
-      WHERE candidates.#{column_name.to_s} LIKE '%#{search}%'
-      }
-    select_clause << %Q{ WHERE elected = 't' } if filter != nil
-    select_clause << %Q{ ORDER BY candidates.#{column_name.to_s} LIMIT #{page_size} OFFSET #{offset}}
 
     Contribution.connection.select_all(select_clause)
   end

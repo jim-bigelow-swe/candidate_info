@@ -36,10 +36,20 @@ class CandidatesController < ApplicationController
       # user unchecked the filter on elected button, removed elected from session
       session.delete(:elected)
       filter = nil
+      Rails.cache.delete("contributor_mix")
+      Rails.cache.delete('Total Contributions')
+      Rails.cache.delete('Contribution Mix')
+      Rails.cache.delete('Contributor Counts')
+
     elsif params[:commit] =~ /Filter/ && !params[:elected].nil? && session[:elected].nil?
       # remember the user checked the filter on elected
       session[:elected] = params[:elected]
       filter = params[:elected]
+      Rails.cache.delete("contributor_mix")
+      Rails.cache.delete('Total Contributions')
+      Rails.cache.delete('Contribution Mix')
+      Rails.cache.delete('Contributor Counts')
+
     elsif !(params[:commit] =~ /Filter/) && params[:elected].nil? && !session[:elected].nil?
       # use the value from session by adding the value to the params list
       params[:elected] = session[:elected]
@@ -52,7 +62,9 @@ class CandidatesController < ApplicationController
     #debugger
     if params[:commit] =~ /Search/
       @candidates = Candidate.search params[:search], params[:page], ordering, filter
-      @contributor_mix = Contribution.find_contrib_mix_per_candidate_range params[:search], params[:page], ordering, filter
+      @contributor_mix = Rails.cache.fetch("contributor_mix") do
+        Contribution.find_contrib_mix_per_candidate filter
+      end
 
       # for total_contributions partial
       @total_message = "Total of all contributions selected by #{params[:search]}"
@@ -61,13 +73,21 @@ class CandidatesController < ApplicationController
       @contributor_counts = Contributor.get_candidate_contributor_makeup_by_selection ordering, params[:search], filter
     else
       @candidates = Candidate.page(params[:page], ordering, filter)
-      @contributor_mix = Contribution.find_contrib_mix_per_candidate params[:page], ordering, filter
+      @contributor_mix = Rails.cache.fetch("contributor_mix") do
+        Contribution.find_contrib_mix_per_candidate filter
+      end
 
       # for total_contributions partial
       @total_message = "Total of all contributions"
-      @total_contributions = Contribution.get_total_amount filter
-      @contribution_mix = Contribution.get_contributions_composition filter
-      @contributor_counts = Contributor.get_contributor_makeup filter
+      @total_contributions = Rails.cache.fetch('Total Contributions') do
+        Contribution.get_total_amount filter
+      end
+      @contribution_mix = Rails.cache.fetch('Contribution Mix') do
+        Contribution.get_contributions_composition filter
+      end
+      @contributor_counts = Rails.cache.fetch('Contributor Counts') do
+        Contributor.get_contributor_makeup filter
+      end
     end
 
     respond_to do |format|

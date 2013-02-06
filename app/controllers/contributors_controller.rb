@@ -48,9 +48,9 @@ class ContributorsController < ApplicationController
         @total_message = "Total of all contributions to elected candidates"
       end
       @contributors = Contributor.paginate(:page => params[:page], :order => ordering)
-      @total_contributions = Contribution.get_total_amount (session[:elected].nil?  ? false : true)
-      @contribution_mix = Contribution.get_contributions_composition (session[:elected].nil?  ? false : true)
-      @contributor_counts = Contributor.get_contributor_makeup (session[:elected].nil?  ? false : true)
+      @total_contributions = Contribution.get_total_amount session[:elected]
+      @contribution_mix = Contribution.get_contributions_composition session[:elected]
+      @contributor_counts = Contributor.get_contributor_makeup session[:elected]
     end
 
     respond_to do |format|
