@@ -54,6 +54,7 @@ group :assets do
 end
 
 gem 'gchart'
+gem 'gchartrb'
 
 gem 'jquery-rails'
 

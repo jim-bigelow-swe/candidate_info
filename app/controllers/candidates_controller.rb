@@ -1,3 +1,4 @@
+require 'google_chart'
 class CandidatesController < ApplicationController
 
 
@@ -90,6 +91,29 @@ class CandidatesController < ApplicationController
         Contributor.get_contributor_makeup filter
       end
     end
+
+    # add chart of contributor mix
+    total = 0
+    @contributor_counts.each do |part|
+      total += part["number"].to_f
+    end
+    chart =  GoogleChart::PieChart.new('160x100', "Contributors", false)
+    @contributor_counts.each do |part|
+      chart.data part["kind"][0], ((part["number"].to_f/total) * 100).to_i
+    end
+    @contributor_chart_url = chart.to_url
+
+
+    #debugger
+    total_number_of_contributions = 0
+    @contribution_mix.each do |portion|
+      total_number_of_contributions += portion["number"].to_f
+    end
+    chart =  GoogleChart::PieChart.new('160x100', "Contributions", false)
+    @contribution_mix.each do |portion|
+      chart.data portion["kind"][0], ((portion["number"].to_f/total_number_of_contributions.to_f) * 100).to_i
+    end
+    @contribution_chart_url = chart.to_url
 
     respond_to do |format|
       format.html # index.html.erb
