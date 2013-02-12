@@ -11,26 +11,25 @@
 <% end %>
 
 <table id='contributors'>
+  <tr><th colspan = 3>Type of Contributor</th> </tr>
   <tr>
-    <th>Type of Contributor</th>
+    <th>Person</th>
+    <th>Co</th>
+    <th>Change</th>
     <th class=<%= @contributions_header %> > <%= link_to "Contributions", {:controller => "contributors", :action => "index", :sort => 'contributions'}, :id =>'contributions_header' %> </th>
     <th class=<%= @last_header %> > <%= link_to "Last", {:controller => "contributors", :action => "index", :sort => 'last'}, :id =>'last_header' %> </th>
     <th class=<%= @city_header %> > <%= link_to "City", {:controller => "contributors", :action => "index", :sort => 'city'}, :id =>'city_header' %> </th>
     <th class=<%= @state_header %> > <%= link_to "State", {:controller => "contributors", :action => "index", :sort => 'state'}, :id =>'state_header' %> </th>
     <th class=<%= @zip_header %> > <%= link_to "Zip", {:controller => "contributors", :action => "index", :sort => 'zip'}, :id =>'zip_header' %> </th>
     <th>Country</th>
-    <th>Modify</th>
   </tr>
 
 <% @contributors.each do |contributor| %>
   <tr class=<%= contributor.kind %> >
-    <td>
       <%= form_for(contributor) do |f| %>
-        <%= f.label "Person" %>
-      <%= radio_button("contributor", "kind", "Person", { :checked => (contributor.kind =~ /Person/ ? true : false) } )%>
-        <%= f.label "Company" %>
-        <%= radio_button("contributor", "kind", "Company", { :checked => (contributor.kind =~ /Company/ ? true : false) }) %>
-        <%= f.submit "Update", { :class => "contrib_kind_submit" } %>
+      <td><%= radio_button("contributor", "kind", "Person", { :checked => (contributor.kind =~ /Person/ ? true : false) } )%> </td>
+      <td><%= radio_button("contributor", "kind", "Company", { :checked => (contributor.kind =~ /Company/ ? true : false) }) %></td>
+      <td><%= f.submit "C", { :class => "contrib_kind_submit" } %> </td>
      <% end %>
     </td>
     <td><%= link_to ( contributor.total.to_f / 100 ), {:controller => "contributors", :action => "show", :id => contributor.id}, :class => "list_contribs" %></td>
@@ -39,7 +38,6 @@
     <td><%= contributor.state %></td>
     <td><%= contributor.zip %></td>
     <td><%= contributor.country %></td>
-    <td><%= link_to 'Edit', edit_contributor_path(contributor) %></td>
   </tr>
 <% end %>
 </table>

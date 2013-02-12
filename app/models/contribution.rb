@@ -3,6 +3,23 @@ class Contribution < ActiveRecord::Base
   belongs_to :contributor
   attr_accessible :amount, :contribution_type, :date, :candidate_id, :contributor_id
 
+  self.per_page = 15
+  def self.get_page_size
+    per_page
+  end
+
+  def self.search(search, page, ordering)
+    expression = ordering.to_s + ' like ?'
+    paginate :per_page => self.per_page, :page => page,
+    :conditions => [expression, "%#{search}%"],
+    :order => ordering
+  end
+
+  def self.page(page, ordering)
+      paginate :per_page => self.per_page, :page => page, :order => ordering
+  end
+
+
   def self.get_total_amount(filter)
     if filter == nil
       select_clause = "SELECT SUM(amount) as total from contributions"
@@ -98,24 +115,14 @@ class Contribution < ActiveRecord::Base
   end
 
   def self.get_all_contributions filter
-    if filter == nil
-      select_clause =
+    select_clause =
      %Q{SELECT candidates.last as candidate, candidates.elected,
         contributors.last as contributor,
         contributions.*
         FROM contributions
         INNER JOIN candidates ON contributions.candidate_id = candidates.id
         INNER JOIN contributors ON contributors.id = contributions.contributor_id }
-    else
-      select_clause =
-       %Q{SELECT candidates.last as candidate, candidates.elected,
-          contributors.last as contributor,
-          contributions.*
-          FROM contributions
-          INNER JOIN candidates ON contributions.candidate_id = candidates.id
-          INNER JOIN contributors ON contributors.id = contributions.contributor_id
-          where candidates.elected = 't' }
-    end
+    select_clause << %{WHERE candidates.elected = 't' } if !filter.nil?
     Contribution.connection.select_all(select_clause)
   end
 

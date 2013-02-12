@@ -66,7 +66,6 @@
     <th>Date</th>
     <th>Amount</th>
     <th>Contribution type</th>
-    <th></th>
   </tr>
 
 <% @contributions.each do |contribution| %>
@@ -75,10 +74,11 @@
     <td><%= contribution["date"] %></td>
     <td><%= link_to (contribution["amount"].to_f / 100), :controller => "contributions", :action => "show", :id => contribution["id"] %></td>
     <td><%= contribution["contribution_type"] %></td>
-    <td><%= link_to 'Show', :controller => "contributions", :action => "show", :id => contribution["id"] %></td>
   </tr>
 <% end %>
 </table>
-
+<p>
+<%= link_to 'Edit', edit_contributor_path(@contributor) %> |
 
 <%= link_to 'List All Contributors', contributors_path %>
+</p>

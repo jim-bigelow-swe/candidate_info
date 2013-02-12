@@ -45,7 +45,7 @@ class ContributorsController < ApplicationController
       if session[:elected].nil?
         @total_message = "Total of all contributions"
       else
-        @total_message = "Total of all contributions to elected candidates"
+        @total_message = "Total of all contributions to elected officials"
       end
       @contributors = Contributor.paginate(:page => params[:page], :order => ordering)
       @total_contributions = Contribution.get_total_amount session[:elected]

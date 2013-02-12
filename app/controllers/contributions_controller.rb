@@ -3,8 +3,44 @@ class ContributionsController < ApplicationController
   # GET /contributions.json
   def index
     #debugger
-    @page_title = "All Contributions"
-    @contributions = Contribution.get_all_contributions (session[:elected].nil?  ? false : true)
+    sort = params[:sort] || session[:sort]
+    ordering = :id
+    case sort
+    when 'date'
+      ordering, @date_header   = :date, 'hilite'
+    when 'amount'
+      ordering, @amount_header = :amount, 'hilite'
+    end
+
+    if params[:sort] != session[:sort]
+      session[:sort] = sort
+      flash.keep
+      if params[:commit].nil?
+        redirect_to :sort => sort  and return
+      else
+        redirect_to :sort => sort, :commit => params[:commit], :search => params[:search] and return
+      end
+    end
+
+    if params[:commit] =~ /Search/
+      @page_title = "Search Results for #{params[:search]} in Contributions"
+      @candidates = Candidate.search params[:search], params[:page], ordering
+    else
+      @page_title = "All Contributions"
+      @contributions = Contribution.page(params[:page], ordering)
+    end
+
+    # construct the composite information of contributions with contributor and candidate names
+    @all_contributions = Rails.cache.fetch("all_contribtions") do
+      Contribution.get_all_contributions nil
+    end
+    @contribution_data = Hash.new
+    @contributions.each do |item|
+      contribution_join_data = @all_contributions.select { |data| data["id"].to_i == item.id.to_i }
+      @contribution_data[item.id.to_i] = contribution_join_data[0]
+    end
+
+
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: @contributions }
@@ -40,6 +76,8 @@ class ContributionsController < ApplicationController
   # POST /contributions
   # POST /contributions.json
   def create
+    Rails.cache.delete("all_contribtions")
+
     #debugger
     @contribution_params = params[:contribution]
     if @contribution_params.nil?

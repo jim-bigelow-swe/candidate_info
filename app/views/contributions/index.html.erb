@@ -4,23 +4,25 @@
   <tr>
     <th>Candidate</th>
     <th>Contributor</th>
-    <th>Date</th>
-    <th>Amount</th>
+    <th class=<% @date_header %>> <%= link_to "Date", :controller => "contributions", :action => "index", :sort => 'date' %></th>
+    <th class=<% @amount_header %>><%= link_to "Amount", :controller => "contributions", :action => "index", :sort => 'amount' %></th>
     <th>Contribution type</th>
-    <th></th>
-    <th></th>
-    <th></th>
   </tr>
 
 <% @contributions.each do |contribution| %>
   <tr <%=  'class=notelected' if contribution["elected"] != 't' %> >
-    <td><%= link_to contribution["candidate"], :controller => "candidates", :action => "show", :id => contribution["candidate_id"] %></td>
-    <td><%= link_to contribution["contributor"], :controller => "contributors", :action => "show", :id => contribution["contributor_id"] %></td>
+    <td><%= link_to @contribution_data[contribution.id]["candidate"], :controller => "candidates", :action => "show", :id => contribution["candidate_id"] %></td>
+    <td><%= link_to @contribution_data[contribution.id]["contributor"], :controller => "contributors", :action => "show", :id => contribution["contributor_id"] %></td>
     <td><%= contribution["date"] %></td>
-    <td><%= (contribution["amount"].to_f / 100) %></td>
+    <td><%= link_to contribution["amount"].to_f / 100,  :controller => "contributions", :action => "show", :id => contribution["id"] %></td>
     <td><%= contribution["contribution_type"] %></td>
-    <td><%= link_to 'Details', :controller => "contributions", :action => "show", :id => contribution["id"] %></td>
   </tr>
 <% end %>
 </table>
 
+<div class="digg_pagination">
+  <div class="page_info">
+     <%= page_entries_info @contributors %>
+  </div>
+  <%= will_paginate @contributors, :container => false %>
+</div>
