@@ -65,13 +65,12 @@ class CandidatesController < ApplicationController
       @contributor_mix = Rails.cache.fetch("contributor_mix") do
         Contribution.find_contrib_mix_per_candidate filter
       end
-      puts "candidates/index: #{@contributor_mix}\n\n"
-
       # for total_contributions partial
       @total_message = "Total of all contributions selected by #{params[:search]}"
       @total_contributions = Contribution.get_candidate_subtotal(ordering, params[:search], filter)
       @contribution_mix = Contribution.get_candidate_contributions_composition_by_selection ordering, params[:search], filter
       @contributor_counts = Contributor.get_candidate_contributor_makeup_by_selection ordering, params[:search], filter
+
     else
       @candidates = Candidate.page(params[:page], ordering, filter)
       @contributor_mix = Rails.cache.fetch("contributor_mix") do
@@ -79,7 +78,8 @@ class CandidatesController < ApplicationController
       end
 
       # for total_contributions partial
-      @total_message = "Total of all contributions"
+      @total_message = filter.nil? ? "Total of all contributions" : "Total of all contributions to elected officials"
+
       @total_contributions = Rails.cache.fetch('Total Contributions') do
         Contribution.get_total_amount filter
       end

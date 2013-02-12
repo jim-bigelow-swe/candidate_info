@@ -49,10 +49,10 @@
     <td><%= candidate.district %></td>
     <td><%= candidate.office %></td>
     <td><%= link_to  (candidate.total.to_f / 100), {:controller => "candidates", :action => "show", :id => candidate.id}, :class => "list_contribs" %></td>
-    <% index = @contributor_mix.index{|x| x["id"] ==  candidate.id} %>
-    <td><%= index.nil? ? 0 : @contributor_mix[index]["total"] %>
-    <td><%= index.nil? ? 0 : @contributor_mix[index]["company"].nil? ? 0 :  @contributor_mix[index]["company"].to_f/100 %>
-    <td><%= index.nil? ? 0 : @contributor_mix[index]["person"].nil? ? 0 : @contributor_mix[index]["person"].to_f/100 %>
+    <% data  = @contributor_mix.select { |item| item["id"].to_i ==  candidate.id.to_i } %>
+    <td><%= data.nil? ? 0 : data[0]["total"] %>
+    <td><%= data.nil? ? 0 : data[0]["company"].nil? ? 0 : data[0]["company"].to_f/100 %>
+    <td><%= data.nil? ? 0 : data[0]["person"].nil? ? 0 : data[0]["person"].to_f/100 %>
   </tr>
 <% end %>
 </table>
