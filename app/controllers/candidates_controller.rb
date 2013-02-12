@@ -65,6 +65,7 @@ class CandidatesController < ApplicationController
       @contributor_mix = Rails.cache.fetch("contributor_mix") do
         Contribution.find_contrib_mix_per_candidate filter
       end
+      puts "candidates/index: #{@contributor_mix}\n\n"
 
       # for total_contributions partial
       @total_message = "Total of all contributions selected by #{params[:search]}"
