@@ -58,7 +58,13 @@ class CandidatesController < ApplicationController
     else
       filter = params[:elected]
     end
-    @elected_checked = filter != nil ? true : false
+
+    if filter.nil?
+      @elected_checked = false
+    else
+      @elected_checked = true
+    end
+
 
     #debugger
     if params[:commit] =~ /Search/
@@ -97,10 +103,12 @@ class CandidatesController < ApplicationController
     @contributor_counts.each do |part|
       total += part["number"].to_f
     end
-    chart =  GoogleChart::PieChart.new('160x100', "Contributors", false)
+    chart =  GoogleChart::PieChart.new('130x100', "Contributors", false)
     @contributor_counts.each do |part|
       chart.data part["kind"][0], ((part["number"].to_f/total) * 100).to_i
     end
+    chart.show_legend = true
+    chart.show_labels = false
     @contributor_chart_url = chart.to_url
 
 
@@ -109,10 +117,11 @@ class CandidatesController < ApplicationController
     @contribution_mix.each do |portion|
       total_number_of_contributions += portion["number"].to_f
     end
-    chart =  GoogleChart::PieChart.new('160x100', "Contributions", false)
+    chart =  GoogleChart::PieChart.new('80x100', "Contributions", false)
     @contribution_mix.each do |portion|
       chart.data portion["kind"][0], ((portion["number"].to_f/total_number_of_contributions.to_f) * 100).to_i
     end
+    chart.show_labels = false
     @contribution_chart_url = chart.to_url
 
     respond_to do |format|

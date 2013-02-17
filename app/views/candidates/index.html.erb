@@ -1,7 +1,6 @@
 <h1>Listing candidates</h1>
 
 <%= render "shared/total_contributions" %>
-
 <div id="search">
 <%= form_tag request.path, :method => 'get' do %>
   <%= content_tag :label do %>
@@ -10,6 +9,7 @@
   <% end %>
   <%= submit_tag 'Search' %>
 <% end %>
+<div id="filter">
 <%= form_tag request.path, :method => 'get' do %>
   <%= content_tag :label do %>
    Restrict to elected officials
@@ -17,6 +17,7 @@
   <%= check_box_tag 'elected', '1', :checked => @elected_checked  %>
   <%= submit_tag 'Filter' %>
 <% end %>
+</div>
 </div>
 
 <table id="candidates">
