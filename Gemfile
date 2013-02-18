@@ -8,7 +8,7 @@ gem 'rails', '3.2.11'
 # for Heroku deployment - as described in Ap. A of ELLS book
 group :development, :test do
   gem 'sqlite3'
-  gem 'ruby-debug19', :require => 'ruby-debug'
+  #gem 'ruby-debug19', :require => 'ruby-debug'
   gem 'cucumber-rails'
   gem 'cucumber-rails-training-wheels'
   gem 'database_cleaner'
@@ -71,4 +71,4 @@ gem 'jquery-rails'
 # gem 'capistrano'
 
 # To use debugger
-#gem 'debugger'
+gem 'debugger'

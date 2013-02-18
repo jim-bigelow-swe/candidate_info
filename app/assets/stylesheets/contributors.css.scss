@@ -11,3 +11,22 @@ div#total_contribution {
     margin-bottom: 0.3em;
     text-align: left; 
 }
+
+div#search_contributors {
+    float:right;
+    padding: 0.4em 0.6em;
+    width: 30em;
+    margin-bottom: 0.3em;
+    text-align: right; 
+}
+div#filter_contributors {
+    float:right;
+    padding: 0.4em 0.6em;
+    width: 30em;
+    margin-bottom: 0.3em;
+    text-align: right; 
+}
+
+table#contributors {
+   clear : both;
+}

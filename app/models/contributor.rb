@@ -5,11 +5,22 @@ class Contributor < ActiveRecord::Base
 
   self.per_page = 15
 
-  def self.search(search, page, ordering)
-    paginate :per_page => self.per_page,
-      :page => page,
-      :conditions => [ordering.to_s + ' like ?', "%#{search}%"],
-      :order => ordering
+  def self.search(search, page, ordering, filter)
+    expression = ordering.to_s + ' like ?'
+    expression = (%Q{elected = 't' and } + expression) if filter != nil
+    paginate :per_page => self.per_page, :page => page,
+    :conditions => [expression, "%#{search}%"],
+    :order => ordering
+  end
+
+  def self.page(page, ordering, filter)
+    if filter == nil
+      paginate :per_page => self.per_page, :page => page, :order => ordering
+    else
+      paginate :per_page => self.per_page, :page => page,
+        :order => ordering,
+        :conditions => %Q{elected = 't'}
+    end
   end
 
   def self.get_contributor_makeup(filter)
@@ -36,6 +47,31 @@ class Contributor < ActiveRecord::Base
          FROM contributors
          WHERE contributors.#{column_name} LIKE '%#{search}%'
          GROUP BY kind })
+  end
+
+  def self.get_contribution_contributor_makeup_by_selection(column_name, search, filter)
+    if column_name == :amount
+      value = search.to_i * 100  # get the number into the range of stored values
+      search = value.to_s
+    end
+    if filter == nil
+      select_clause = %Q{
+         SELECT kind, COUNT(*) as number
+         FROM contributors
+         JOIN contributions ON contributors.id = contributions.contributor_id
+         JOIN candidates ON contributions.candidate_id = candidates.id
+         WHERE contributions.#{column_name} LIKE '%#{search}%'
+         GROUP BY kind }
+    else
+      select_clause = %Q{
+         SELECT kind, COUNT(*) as number
+         FROM contributors
+         JOIN contributions ON contributors.id = contributions.contributor_id
+         JOIN candidates ON contributions.candidate_id = candidates.id
+         WHERE candidates.elected = 't' AND contributions.#{column_name} LIKE '%#{search}%'
+         GROUP BY kind }
+    end
+    Contributor.connection.select_all(select_clause)
   end
 
   def self.get_candidate_contributor_makeup_by_selection(column_name, search, filter)

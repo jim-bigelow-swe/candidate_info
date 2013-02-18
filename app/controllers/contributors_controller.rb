@@ -1,3 +1,4 @@
+require 'google_chart'
 class ContributorsController < ApplicationController
   # GET /contributors
   # GET /contributors.json
@@ -5,6 +6,14 @@ class ContributorsController < ApplicationController
     @page_title = "Contributors Listing"
 
     #debugger
+
+    if !params[:clear].nil?
+      #clear out any sorting or searching parameters in session
+      session.except! :sort, :search
+      params.except! :sort, :search, :utf8, :clear
+      redirect_to params and return
+    end
+
     sort = params[:sort] || session[:sort]
     case sort
     when 'contributions'
@@ -19,7 +28,7 @@ class ContributorsController < ApplicationController
       ordering, @zip_header =  :zip, 'hilite'
     end
     if ordering.nil?
-      ordering = :last
+      ordering = :id
     end
 
 
@@ -33,25 +42,66 @@ class ContributorsController < ApplicationController
       end
     end
 
+    # checked the elected filter, but do not put in session if not there
+    # user must do that on the Candidates page with the "Filter" button
+    filter = params[:elected] || session[:elected]
+    if params[:elected].nil? and !session[:elected].nil?
+      # elected filter comes in the session, correct the RESTful URL
+      params[:elected] = session[:elected]
+      redirect_to params and return
+    end
+    if filter.nil?
+      @elected_checked = false
+    else
+      @elected_checked = true
+    end
+
+
     if params[:commit] =~ /Search/
       #debugger
       @total_message = "Total of all contributions selected by #{params[:search]}"
-      @contributors = Contributor.search params[:search], params[:page], ordering
+      @contributors = Contributor.search params[:search], params[:page], ordering, filter
 
-      @total_contributions = Contribution.get_contributor_subtotal ordering, params[:search]
-      @contribution_mix = Contribution.get_contributions_composition_by_selection ordering, params[:search]
+      @total_contributions = Contribution.get_contributor_subtotal ordering, params[:search], filter
+      @contribution_mix = Contribution.get_contributor_contributions_composition_by_selection ordering, params[:search], filter
       @contributor_counts = Contributor.get_contributor_makeup_by_selection ordering, params[:search]
     else
-      if session[:elected].nil?
+      if filter.nil?
         @total_message = "Total of all contributions"
       else
         @total_message = "Total of all contributions to elected officials"
       end
-      @contributors = Contributor.paginate(:page => params[:page], :order => ordering)
-      @total_contributions = Contribution.get_total_amount session[:elected]
-      @contribution_mix = Contribution.get_contributions_composition session[:elected]
-      @contributor_counts = Contributor.get_contributor_makeup session[:elected]
+      @contributors = Contributor.page params[:page], ordering, filter
+      @total_contributions = Contribution.get_total_amount filter
+      @contribution_mix = Contribution.get_contributions_composition filter
+      @contributor_counts = Contributor.get_contributor_makeup filter
     end
+
+
+    # add chart of contributor mix
+    total = 0
+    @contributor_counts.each do |part|
+      total += part["number"].to_f
+    end
+    chart =  GoogleChart::PieChart.new('130x100', "Contributors", false)
+    @contributor_counts.each do |part|
+      chart.data part["kind"][0], ((part["number"].to_f/total) * 100).to_i
+    end
+    chart.show_legend = true
+    chart.show_labels = false
+    @contributor_chart_url = chart.to_url
+
+    #debugger
+    total_number_of_contributions = 0
+    @contribution_mix.each do |portion|
+      total_number_of_contributions += portion["number"].to_f
+    end
+    chart =  GoogleChart::PieChart.new('80x100', "Contributions", false)
+    @contribution_mix.each do |portion|
+      chart.data portion["kind"][0], ((portion["number"].to_f/total_number_of_contributions.to_f) * 100).to_i
+    end
+    chart.show_labels = false
+    @contribution_chart_url = chart.to_url
 
     respond_to do |format|
       format.html # index.html.erb

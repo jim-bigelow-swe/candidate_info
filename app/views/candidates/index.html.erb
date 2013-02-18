@@ -1,6 +1,7 @@
 <h1>Listing candidates</h1>
 
 <%= render "shared/total_contributions" %>
+
 <div id="search">
 <%= form_tag request.path, :method => 'get' do %>
   <%= content_tag :label do %>
@@ -8,13 +9,19 @@
     <%= text_field_tag :search, params[:search] %>
   <% end %>
   <%= submit_tag 'Search' %>
+  <%= button_tag 'Reset', :type => 'reset' %>
+  <%= button_tag 'Clear All Search and Sort', :name => 'clear' %>
 <% end %>
 <div id="filter">
 <%= form_tag request.path, :method => 'get' do %>
   <%= content_tag :label do %>
    Restrict to elected officials
   <% end %>
-  <%= check_box_tag 'elected', '1', :checked => @elected_checked  %>
+  <% if @elected_checked %>
+    <%= check_box_tag 'elected', '1', :checked => @elected_checked  %>
+  <% else %>
+    <%= check_box_tag 'elected', '1' %>
+  <% end %>
   <%= submit_tag 'Filter' %>
 <% end %>
 </div>
