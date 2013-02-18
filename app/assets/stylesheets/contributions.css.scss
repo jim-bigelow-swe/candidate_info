@@ -1,6 +1,20 @@
 // Place all the styles related to the Contributions controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
-th.hilite {
+
+table#contributions th.hilite {
   background-color: yellow;
+}
+
+
+div#search_contribution {
+    float:right;
+    padding: 0.4em 0.6em;
+    width: 30em;
+    margin-bottom: 0.3em;
+    text-align: right; 
+}
+
+table#contributions {
+   clear : both;
 }

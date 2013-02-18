@@ -1,8 +1,18 @@
+require 'google_chart'
 class ContributionsController < ApplicationController
   # GET /contributions
   # GET /contributions.json
   def index
     #debugger
+
+    if !params[:clear].nil?
+      #clear out any sorting or searching parameters in session
+      session.except! :sort, :search
+      params.except! :sort, :search, :utf8, :clear
+      redirect_to params and return
+    end
+
+    @page_title = "Contributions to Candidates"
     sort = params[:sort] || session[:sort]
     ordering = :id
     case sort
@@ -22,18 +32,77 @@ class ContributionsController < ApplicationController
       end
     end
 
-    if params[:commit] =~ /Search/
-      @page_title = "Search Results for #{params[:search]} in Contributions"
-      @candidates = Candidate.search params[:search], params[:page], ordering
+    # checked the elected filter, but do not put in session if not there
+    # user must do that on the Candidates page with the "Filter" button
+    filter = params[:elected] || session[:elected]
+    if params[:elected].nil? and !session[:elected].nil?
+      # elected filter comes in the session, correct the RESTful URL
+      params[:elected] = session[:elected]
+      redirect_to params and return
+    end
+    if filter.nil?
+      @elected_checked = false
     else
-      @page_title = "All Contributions"
-      @contributions = Contribution.page(params[:page], ordering)
+      @elected_checked = true
     end
 
-    # construct the composite information of contributions with contributor and candidate names
-    @all_contributions = Rails.cache.fetch("all_contribtions") do
-      Contribution.get_all_contributions nil
+    if params[:commit] =~ /Search/
+
+      @contributions = Contribution.search params[:search], params[:page], ordering, filter
+
+      # for total_contributions partial
+      @total_message = "Total of all contributions selected by #{params[:search]}"
+      @total_contributions = Contribution.get_contribution_subtotal(ordering, params[:search], filter)
+      @contribution_mix = Contribution.get_contribution_composition_by_selection ordering, params[:search], filter
+      @contributor_counts = Contributor.get_contribution_contributor_makeup_by_selection ordering, params[:search], filter
+
+    else
+      @contributions = Contribution.page params[:page], ordering, filter
+
+      # for total_contributions partial
+      @total_message = filter.nil? ? "Total of all contributions" : "Total of all contributions to elected officials"
+
+      @total_contributions = Rails.cache.fetch('Total Contributions') do
+        Contribution.get_total_amount filter
+      end
+      @contribution_mix = Rails.cache.fetch('Contribution Mix') do
+        Contribution.get_contributions_composition filter
+      end
+      @contributor_counts = Rails.cache.fetch('Contributor Counts') do
+        Contributor.get_contributor_makeup filter
+      end
     end
+
+    # add chart of contributor mix
+    total = 0
+    @contributor_counts.each do |part|
+      total += part["number"].to_f
+    end
+    chart =  GoogleChart::PieChart.new('130x100', "Contributors", false)
+    @contributor_counts.each do |part|
+      chart.data part["kind"][0], ((part["number"].to_f/total) * 100).to_i
+    end
+    chart.show_legend = true
+    chart.show_labels = false
+    @contributor_chart_url = chart.to_url
+
+
+    total_number_of_contributions = 0
+    @contribution_mix.each do |portion|
+      total_number_of_contributions += portion["number"].to_f
+    end
+    chart =  GoogleChart::PieChart.new('80x100', "Contributions", false)
+    @contribution_mix.each do |portion|
+      chart.data portion["kind"][0], ((portion["number"].to_f/total_number_of_contributions.to_f) * 100).to_i
+    end
+    chart.show_labels = false
+    @contribution_chart_url = chart.to_url
+
+    # construct the composite information of contributions with contributor and candidate names
+    @all_contributions = Rails.cache.fetch("all_contributions") do
+      Contribution.get_all_contributions filter
+    end
+
     @contribution_data = Hash.new
     @contributions.each do |item|
       contribution_join_data = @all_contributions.select { |data| data["id"].to_i == item.id.to_i }

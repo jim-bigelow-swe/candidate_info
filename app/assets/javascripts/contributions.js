@@ -1,4 +1,4 @@
-
+/*
 CONTRIBSINFO = {
     setup: function() {
         // construct new DOM elements
@@ -22,3 +22,5 @@ CONTRIBSINFO = {
     }
 }
 $(CONTRIBSINFO.setup);       // when document ready, run setup code
+
+*/

@@ -1,5 +1,24 @@
 <h1>Listing contributions</h1>
 
+<%= render "shared/total_contributions" %>
+
+<div id="search_contribution">
+<%= form_tag request.path, :method => 'get', :id => 'search_contributions' do %>
+  <%= content_tag :label do %>
+    Search term:
+    <%= text_field_tag :search, params[:search] %>
+  <% end %>
+  <%= submit_tag 'Search' %>
+  <%= button_tag 'Reset', :type => 'reset' %>
+  <%= button_tag 'Clear All Search and Sort', :name => 'clear' %>
+<% end %>
+  <% if @elected_checked %>
+    Note: Display restricted to only elected officials,<br/>
+    Unset on Candidates Listing page.
+  <% end %>
+</div>
+
+
 <table id="contributions">
   <tr>
     <th>Candidate</th>

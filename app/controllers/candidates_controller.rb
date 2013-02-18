@@ -5,6 +5,14 @@ class CandidatesController < ApplicationController
   # GET /candidates
   # GET /candidates.json
   def index
+
+    if !params[:clear].nil?
+      #clear out any sorting or searching parameters in session
+      session.except! :sort, :search
+      params.except! :sort, :search, :utf8, :clear
+      redirect_to params and return
+    end
+
     # find candidates
     sort = params[:sort] || session[:sort]
     case sort
@@ -32,8 +40,9 @@ class CandidatesController < ApplicationController
       end
     end
 
-
+    #debugger
     if params[:commit] =~ /Filter/ && params[:elected].nil? && !session[:elected].nil?
+      # params contains Filter but not elected and session does have elected
       # user unchecked the filter on elected button, removed elected from session
       session.delete(:elected)
       filter = nil
@@ -42,7 +51,11 @@ class CandidatesController < ApplicationController
       Rails.cache.delete('Contribution Mix')
       Rails.cache.delete('Contributor Counts')
 
+      redirect_to params.except :utf8, :commit and return
+
+
     elsif params[:commit] =~ /Filter/ && !params[:elected].nil? && session[:elected].nil?
+      # params contains Filter and elected and session doesn't
       # remember the user checked the filter on elected
       session[:elected] = params[:elected]
       filter = params[:elected]
@@ -51,14 +64,22 @@ class CandidatesController < ApplicationController
       Rails.cache.delete('Contribution Mix')
       Rails.cache.delete('Contributor Counts')
 
+    elsif params[:commit] =~ /Filter/ && params[:elected].nil? && session[:elected].nil?
+      # params just has Filter, but not elected and it's not is session either
+      # just clean up the RESTful URL
+      redirect_to params.except :utf8, :commit and return
+
     elsif !(params[:commit] =~ /Filter/) && params[:elected].nil? && !session[:elected].nil?
+      # params doesn't have filter or elected and session does
       # use the value from session by adding the value to the params list
       params[:elected] = session[:elected]
       redirect_to params and return
+
     else
       filter = params[:elected]
     end
 
+    #debugger
     if filter.nil?
       @elected_checked = false
     else
@@ -66,7 +87,6 @@ class CandidatesController < ApplicationController
     end
 
 
-    #debugger
     if params[:commit] =~ /Search/
       @candidates = Candidate.search params[:search], params[:page], ordering, filter
       @contributor_mix = Rails.cache.fetch("contributor_mix") do

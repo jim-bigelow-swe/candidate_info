@@ -8,21 +8,34 @@ class Contribution < ActiveRecord::Base
     per_page
   end
 
-  def self.search(search, page, ordering)
+  def self.search(search, page, ordering, filter)
+      if ordering == :amount
+      value = search.to_i * 100  # get the number into the range of stored values
+      search = value.to_s
+    end
+
     expression = ordering.to_s + ' like ?'
+    expression = (%Q{elected = 't' and } + expression) if filter != nil
     paginate :per_page => self.per_page, :page => page,
     :conditions => [expression, "%#{search}%"],
     :order => ordering
   end
 
-  def self.page(page, ordering)
+  def self.page(page, ordering, filter)
+
+    if filter == nil
       paginate :per_page => self.per_page, :page => page, :order => ordering
+    else
+      paginate :per_page => self.per_page, :page => page,
+        :order => ordering,
+        :conditions => %Q{elected = 't'}
+    end
   end
 
 
   def self.get_total_amount(filter)
     if filter == nil
-      select_clause = "SELECT SUM(amount) as total from contributions"
+      select_clause = %Q{SELECT SUM(amount) AS total FROM contributions}
     else
       select_clause = %Q{SELECT SUM(amount) as total FROM contributions
                          INNER JOIN candidates ON contributions.candidate_id = candidates.id
@@ -30,6 +43,22 @@ class Contribution < ActiveRecord::Base
     end
     contributions = Contribution.connection.select_all(select_clause)
     #puts "Contribution.get_total_amount: #{contributions}"
+    amount = contributions[0]
+    amount["total"]
+  end
+
+  def self.get_contribution_subtotal(column_name, search, filter)
+    if filter == nil
+      select_clause =
+       %Q{SELECT SUM(amount) as total FROM contributions
+          WHERE contributions.#{column_name} LIKE '%#{search}%'}
+    else
+      select_clause =
+       %Q{SELECT SUM(amount) as total FROM contributions
+          INNER JOIN candidates ON contributions.candidate_id = candidates.id
+          WHERE candidates.elected = 't' AND contributions.#{column_name} LIKE '%#{search}%'}
+    end
+    contributions = Contribution.connection.select_all(select_clause)
     amount = contributions[0]
     amount["total"]
   end
@@ -156,7 +185,32 @@ class Contribution < ActiveRecord::Base
     Contribution.connection.select_all(select_clause)
   end
 
-  def self.get_contributions_composition_by_selection(column_name, search, filter)
+  def self.get_contribution_composition_by_selection(column_name, search, filter)
+    if column_name == :amount
+      value = search.to_i * 100  # get the number into the range of stored values
+      search = value.to_s
+    end
+
+    if filter == nil
+      select_clause = %Q{
+       SELECT kind, COUNT(*) as number, SUM(amount) as total
+       FROM contributors JOIN contributions
+       ON contributors.id = contributions.contributor_id
+       WHERE contributions.#{column_name} LIKE '%#{search}%'
+       GROUP BY kind }
+    else
+      select_clause = %Q{
+       SELECT kind, COUNT(*) as number, SUM(amount) as total
+       FROM contributors
+       JOIN contributions ON contributors.id = contributions.contributor_id
+       INNER JOIN candidates ON contributions.candidate_id = candidates.id
+       WHERE candidates.elected = 't' AND contributions.#{column_name} LIKE '%#{search}%'
+       GROUP BY kind }
+    end
+    Contribution.connection.select_all(select_clause)
+  end
+
+  def self.get_contributor_contributions_composition_by_selection(column_name, search, filter)
     if filter == nil
       select_clause = %Q{
        SELECT kind, COUNT(*) as number, SUM(amount) as total
@@ -170,7 +224,7 @@ class Contribution < ActiveRecord::Base
        FROM contributors
        JOIN contributions ON contributors.id = contributions.contributor_id
        INNER JOIN candidates ON contributions.candidate_id = candidates.id
-       WHERE candidates.electe = 't' AND contributors.#{column_name} LIKE '%#{search}%'
+       WHERE candidates.elected = 't' AND contributors.#{column_name} LIKE '%#{search}%'
        GROUP BY kind }
     end
     Contribution.connection.select_all(select_clause)
