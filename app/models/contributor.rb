@@ -70,17 +70,22 @@ class Contributor < ActiveRecord::Base
   end
 
   def self.get_contribution_contributor_makeup_by_selection(column_name, search, filter)
+    operator = "LIKE"
     if column_name == :amount
       value = search.to_i * 100  # get the number into the range of stored values
       search = value.to_s
+      operator = ">="
+    else
+      search = %Q{'%#{search}%'}
     end
+
     if filter == nil
       select_clause = %Q{
          SELECT kind, COUNT(*) as number
          FROM contributors
          JOIN contributions ON contributors.id = contributions.contributor_id
          JOIN candidates ON contributions.candidate_id = candidates.id
-         WHERE contributions.#{column_name} LIKE '%#{search}%'
+         WHERE contributions.#{column_name} #{operators} #{search}
          GROUP BY kind }
     else
       select_clause = %Q{
@@ -88,7 +93,7 @@ class Contributor < ActiveRecord::Base
          FROM contributors
          JOIN contributions ON contributors.id = contributions.contributor_id
          JOIN candidates ON contributions.candidate_id = candidates.id
-         WHERE candidates.elected = 't' AND contributions.#{column_name} LIKE '%#{search}%'
+         WHERE candidates.elected = 't' AND contributions.#{column_name} #{operator} #{search}
          GROUP BY kind }
     end
     Contributor.connection.select_all(select_clause)
