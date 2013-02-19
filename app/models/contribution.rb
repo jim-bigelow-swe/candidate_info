@@ -15,7 +15,11 @@ class Contribution < ActiveRecord::Base
     end
 
     expression = ordering.to_s + ' like ?'
-    expression = (%Q{elected = 't' and } + expression) if filter != nil
+    expression = (%Q{contributions.candidate_id IN
+                     (SELECT candidates.id
+                      FROM candidates
+                      WHERE candidates.elected = 't' AND
+                      candidates.id = contributions.candidate_id) AND } + expression) if filter != nil
     paginate :per_page => self.per_page, :page => page,
     :conditions => [expression, "%#{search}%"],
     :order => ordering
@@ -28,7 +32,11 @@ class Contribution < ActiveRecord::Base
     else
       paginate :per_page => self.per_page, :page => page,
         :order => ordering,
-        :conditions => %Q{elected = 't'}
+        :conditions => %Q{contributions.candidate_id IN
+                          (SELECT candidates.id
+                           FROM candidates
+                           WHERE candidates.elected = 't' AND
+                           candidates.id = contributions.candidate_id)}
     end
   end
 

@@ -14,7 +14,7 @@
 <% end %>
   <% if @elected_checked %>
     Note: Display restricted to only elected officials,<br/>
-    Unset on Candidates Listing page.
+    Unset on <%= link_to "Candidates Listing page", :controller => "candidates", :action => "index" %>.
   <% end %>
 </div>
 

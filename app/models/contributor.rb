@@ -6,8 +6,12 @@ class Contributor < ActiveRecord::Base
   self.per_page = 15
 
   def self.search(search, page, ordering, filter)
-    expression = ordering.to_s + ' like ?'
-    expression = (%Q{elected = 't' and } + expression) if filter != nil
+    expression = ordering.to_s + ' LIKE ?'
+    expression = (%Q{contributors.id IN
+                     (SELECT contributions.contributor_id
+                      FROM contributions
+                      JOIN candidates on contributions.candidate_id = candidates.id
+                      WHERE candidates.elected = 't' ) AND } + expression) if filter != nil
     paginate :per_page => self.per_page, :page => page,
     :conditions => [expression, "%#{search}%"],
     :order => ordering
@@ -19,7 +23,11 @@ class Contributor < ActiveRecord::Base
     else
       paginate :per_page => self.per_page, :page => page,
         :order => ordering,
-        :conditions => %Q{elected = 't'}
+        :conditions => %Q{contributors.id IN
+                          (SELECT contributions.contributor_id
+                           FROM contributions
+                           JOIN candidates on contributions.candidate_id = candidates.id
+                           WHERE candidates.elected = 't' )}
     end
   end
 
@@ -41,12 +49,24 @@ class Contributor < ActiveRecord::Base
     Contributor.connection.select_all(select_clause)
   end
 
-  def self.get_contributor_makeup_by_selection(column_name, search)
-    Contributor.connection.select_all(%Q{
+  def self.get_contributor_makeup_by_selection(column_name, search, filter)
+    if filter == nil
+      select_clause = %Q{
          SELECT kind, COUNT(*) as number
          FROM contributors
          WHERE contributors.#{column_name} LIKE '%#{search}%'
-         GROUP BY kind })
+         GROUP BY kind }
+    else
+      select_clause = %Q{
+         SELECT kind, COUNT(*) as number
+         FROM contributors
+         JOIN contributions ON contributors.id = contributions.contributor_id
+         JOIN candidates ON contributions.candidate_id = candidates.id
+         WHERE candidates.elected = 't'
+         AND contributors.#{column_name} LIKE '%#{search}%'
+         GROUP BY kind }
+    end
+    Contributor.connection.select_all(select_clause)
   end
 
   def self.get_contribution_contributor_makeup_by_selection(column_name, search, filter)

@@ -64,7 +64,7 @@ class ContributorsController < ApplicationController
 
       @total_contributions = Contribution.get_contributor_subtotal ordering, params[:search], filter
       @contribution_mix = Contribution.get_contributor_contributions_composition_by_selection ordering, params[:search], filter
-      @contributor_counts = Contributor.get_contributor_makeup_by_selection ordering, params[:search]
+      @contributor_counts = Contributor.get_contributor_makeup_by_selection ordering, params[:search], filter
     else
       if filter.nil?
         @total_message = "Total of all contributions"

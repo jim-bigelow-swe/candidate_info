@@ -76,6 +76,10 @@ border-bottom: 3px dotted #77d;
   background: wheat;
 }
 
+table#candidates {
+  clear : both;
+}
+
 table#candidates th.hilite {
   background-color: yellow;
 }
