@@ -56,6 +56,11 @@ class Contribution < ActiveRecord::Base
   end
 
   def self.get_contribution_subtotal(column_name, search, filter)
+    if column_name == :amount
+      value = search.to_i * 100  # get the number into the range of stored values
+      search = value.to_s
+    end
+
     if filter == nil
       select_clause =
        %Q{SELECT SUM(amount) as total FROM contributions
