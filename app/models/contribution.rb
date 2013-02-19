@@ -9,22 +9,19 @@ class Contribution < ActiveRecord::Base
   end
 
   def self.search(search, page, ordering, filter)
-
     operator = %Q{LIKE}
     if ordering == :amount
       value = search.to_i * 100  # get the number into the range of stored values
       search = value.to_s
       operator = ">="
     elsif ordering == :date
-      operator = ">="
+      operator = ">"
     else
       operator = %Q{LIKE}
       search = %Q{%#{search}%}
     end
 
     expression = ordering.to_s + %Q{ #{operator} ?}
-
-    puts expression
 
     expression = (%Q{contributions.candidate_id IN
                      (SELECT candidates.id
@@ -73,7 +70,8 @@ class Contribution < ActiveRecord::Base
       search = value.to_s
       operator = ">="
     elsif column_name == :date
-      operator = "="
+      operator = ">"
+      search = %Q{'#{search}'}
     else
       search = %Q{'%#{search}%'}
     end
@@ -94,16 +92,25 @@ class Contribution < ActiveRecord::Base
   end
 
   def self.get_candidate_subtotal(column_name, search, filter)
+    operator = "LIKE"
+    if column_name == :total
+      value = search.to_i * 100  # get the number into the range of stored values
+      search = value.to_s
+      operator = ">="
+    else
+      search = %Q{'%#{search}%'}
+    end
+
     if filter == nil
       select_clause =
        %Q{SELECT SUM(amount) as total FROM contributions
           INNER JOIN candidates ON contributions.candidate_id = candidates.id
-          WHERE candidates.#{column_name} LIKE '%#{search}%'}
+          WHERE candidates.#{column_name} #{operator} #{search}}
     else
       select_clause =
        %Q{SELECT SUM(amount) as total FROM contributions
           INNER JOIN candidates ON contributions.candidate_id = candidates.id
-          WHERE candidates.elected = 't' AND candidates.#{column_name} LIKE '%#{search}%'}
+          WHERE candidates.elected = 't' AND candidates.#{column_name} #{operator} #{search}}
     end
     contributions = Contribution.connection.select_all(select_clause)
     amount = contributions[0]
@@ -222,7 +229,8 @@ class Contribution < ActiveRecord::Base
       search = value.to_s
       operator = ">="
     elsif column_name == :date
-      operator = "="
+      operator = ">"
+      search = %Q{'#{search}'}
     else
       search = %Q{'%#{search}%'}
     end
@@ -267,13 +275,22 @@ class Contribution < ActiveRecord::Base
   end
 
   def self.get_candidate_contributions_composition_by_selection(column_name, search, filter)
+    operator = "LIKE"
+    if column_name == :total
+      value = search.to_i * 100  # get the number into the range of stored values
+      search = value.to_s
+      operator = ">="
+    else
+      search = %Q{'%#{search}%'}
+    end
+
     if filter == nil
       select_clause = %Q{
        SELECT kind, COUNT(*) as number, SUM(amount) as total
        FROM contributors
        JOIN contributions ON contributors.id = contributions.contributor_id
        JOIN candidates ON contributions.candidate_id = candidates.id
-       WHERE candidates.#{column_name} LIKE '%#{search}%'
+       WHERE candidates.#{column_name} #{operator} #{search}
        GROUP BY kind }
     else
       select_clause = %Q{
@@ -281,7 +298,7 @@ class Contribution < ActiveRecord::Base
        FROM contributors
        JOIN contributions ON contributors.id = contributions.contributor_id
        JOIN candidates ON contributions.candidate_id = candidates.id
-       WHERE candidates.elected = 't' AND candidates.#{column_name} LIKE '%#{search}%'
+       WHERE candidates.elected = 't' AND candidates.#{column_name} #{operator} #{search}
        GROUP BY kind }
     end
     Contribution.connection.select_all(select_clause)

@@ -93,7 +93,11 @@ class CandidatesController < ApplicationController
         Contribution.find_contrib_mix_per_candidate filter
       end
       # for total_contributions partial
-      @total_message = "Total of all contributions selected by #{params[:search]}"
+      if ordering == :total
+        @total_message = "Total of all contributions where Candidate Total >= #{params[:search]}"
+      else
+        @total_message = "Total of all contributions selected by #{params[:search]}"
+      end
       @total_contributions = Contribution.get_candidate_subtotal(ordering, params[:search], filter)
       @contribution_mix = Contribution.get_candidate_contributions_composition_by_selection ordering, params[:search], filter
       @contributor_counts = Contributor.get_candidate_contributor_makeup_by_selection ordering, params[:search], filter

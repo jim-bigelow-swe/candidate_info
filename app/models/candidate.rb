@@ -9,10 +9,20 @@ class Candidate < ActiveRecord::Base
   end
 
   def self.search(search, page, ordering, filter)
-    expression = ordering.to_s + ' like ?'
+    operator = %Q{LIKE}
+    if ordering == :total
+      value = search.to_i * 100  # get the number into the range of stored values
+      search = value.to_s
+      operator = ">="
+    else
+      operator = %Q{LIKE}
+      search = %Q{%#{search}%}
+    end
+
+    expression = ordering.to_s + %Q{ #{operator} ?}
     expression = (%Q{elected = 't' and } + expression) if filter != nil
     paginate :per_page => self.per_page, :page => page,
-    :conditions => [expression, "%#{search}%"],
+    :conditions => [expression, search],
     :order => ordering
   end
 

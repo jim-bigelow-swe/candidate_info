@@ -18,6 +18,11 @@
       <%= yield %>
     </div>
   </div>
-
+  <div id="nav_links">
+  | <%= link_to "Candidates Listing page", :controller => "candidates", :action => "index" %>
+  | <%= link_to "Contributions Listing page", :controller => "contributions", :action => "index" %>
+  | <%= link_to "Contributors Listing page", :controller => "contributors", :action => "index" %>
+  |
+  </div>
 </body>
 </html>

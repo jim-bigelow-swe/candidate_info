@@ -51,7 +51,14 @@ class ContributionsController < ApplicationController
       @contributions = Contribution.search params[:search], params[:page], ordering, filter
 
       # for total_contributions partial
-      @total_message = "Total of all contributions selected by #{params[:search]}"
+      if ordering == :date
+        @total_message = "Total of all contributions after #{params[:search]}"
+      elsif ordering == :amount
+        @total_message = "Total of all contributions greater than or equal to #{params[:search]}"
+      else
+        @total_message = "Total of all contributions selected by #{params[:search]}"
+      end
+
       @total_contributions = Contribution.get_contribution_subtotal(ordering, params[:search], filter)
       @contribution_mix = Contribution.get_contribution_composition_by_selection ordering, params[:search], filter
       @contributor_counts = Contributor.get_contribution_contributor_makeup_by_selection ordering, params[:search], filter
