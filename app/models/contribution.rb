@@ -15,6 +15,8 @@ class Contribution < ActiveRecord::Base
       value = search.to_i * 100  # get the number into the range of stored values
       search = value.to_s
       operator = ">="
+    elsif ordering == :date
+      operator = ">="
     else
       operator = %Q{LIKE}
       search = %Q{%#{search}%}
@@ -70,6 +72,8 @@ class Contribution < ActiveRecord::Base
       value = search.to_i * 100  # get the number into the range of stored values
       search = value.to_s
       operator = ">="
+    elsif column_name == :date
+      operator = "="
     else
       search = %Q{'%#{search}%'}
     end
@@ -217,6 +221,8 @@ class Contribution < ActiveRecord::Base
       value = search.to_i * 100  # get the number into the range of stored values
       search = value.to_s
       operator = ">="
+    elsif column_name == :date
+      operator = "="
     else
       search = %Q{'%#{search}%'}
     end
