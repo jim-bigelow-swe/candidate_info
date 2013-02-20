@@ -52,7 +52,7 @@ class ContributionsController < ApplicationController
 
       # for total_contributions partial
       if ordering == :date
-        @total_message = "Total of all contributions after #{params[:search]}"
+        @total_message = %Q{Total of all contributions after: "Date #{params[:search]}" }
       elsif ordering == :amount
         @total_message = "Total of all contributions greater than or equal to #{params[:search]}"
       else
@@ -85,7 +85,7 @@ class ContributionsController < ApplicationController
     @contributor_counts.each do |part|
       total += part["number"].to_f
     end
-    chart =  GoogleChart::PieChart.new('130x100', "Contributors", false)
+    chart =  GoogleChart::PieChart.new('130x75', "", false)
     @contributor_counts.each do |part|
       chart.data part["kind"][0], ((part["number"].to_f/total) * 100).to_i
     end
@@ -98,12 +98,20 @@ class ContributionsController < ApplicationController
     @contribution_mix.each do |portion|
       total_number_of_contributions += portion["number"].to_f
     end
-    chart =  GoogleChart::PieChart.new('80x100', "Contributions", false)
+    chart =  GoogleChart::PieChart.new('75x75', "", false)
     @contribution_mix.each do |portion|
       chart.data portion["kind"][0], ((portion["number"].to_f/total_number_of_contributions.to_f) * 100).to_i
     end
     chart.show_labels = false
     @contribution_chart_url = chart.to_url
+
+    chart =  GoogleChart::PieChart.new('75x75', "", false)
+    @contribution_mix.each do |portion|
+      chart.data portion["kind"][0], ((portion["total"].to_f/@total_contributions.to_f) * 100).to_i
+    end
+    chart.show_labels = false
+    chart.show_legend = false
+    @contribution_percent_chart_url = chart.to_url
 
     # construct the composite information of contributions with contributor and candidate names
     @all_contributions = Rails.cache.fetch("all_contributions") do

@@ -7,7 +7,7 @@ class Contributor < ActiveRecord::Base
 
   def self.search(search, page, ordering, filter)
     operator = %Q{LIKE}
-    if ordering == :amount
+    if ordering == :total
       value = search.to_i * 100  # get the number into the range of stored values
       search = value.to_s
       operator = ">="
@@ -45,12 +45,12 @@ class Contributor < ActiveRecord::Base
   def self.get_contributor_makeup(filter)
     if filter == nil
       select_clause = %Q{
-         SELECT kind, COUNT(*) as number
+         SELECT kind, COUNT(distinct contributors.id) as number
          FROM contributors
          GROUP BY kind }
     else
       select_clause = %Q{
-         SELECT kind, COUNT(*) as number
+         SELECT kind, COUNT(distinct contributors.id) as number
          FROM contributors
          JOIN contributions ON contributors.id = contributions.contributor_id
          JOIN candidates ON contributions.candidate_id = candidates.id
@@ -61,20 +61,30 @@ class Contributor < ActiveRecord::Base
   end
 
   def self.get_contributor_makeup_by_selection(column_name, search, filter)
+    operator = %Q{LIKE}
+    if column_name == :total
+      value = search.to_i * 100  # get the number into the range of stored values
+      search = value.to_s
+      operator = ">="
+    else
+      operator = %Q{LIKE}
+      search = %Q{"%#{search}%"}
+    end
+
     if filter == nil
       select_clause = %Q{
-         SELECT kind, COUNT(*) as number
+         SELECT kind, COUNT(distinct contributors.id) as number
          FROM contributors
-         WHERE contributors.#{column_name} LIKE '%#{search}%'
+         WHERE contributors.#{column_name} #{operator} #{search}
          GROUP BY kind }
     else
       select_clause = %Q{
-         SELECT kind, COUNT(*) as number
+         SELECT kind, COUNT(distinct contributors.id) as number
          FROM contributors
          JOIN contributions ON contributors.id = contributions.contributor_id
          JOIN candidates ON contributions.candidate_id = candidates.id
          WHERE candidates.elected = 't'
-         AND contributors.#{column_name} LIKE '%#{search}%'
+         AND contributors.#{column_name} #{operator} #{search}
          GROUP BY kind }
     end
     Contributor.connection.select_all(select_clause)
@@ -95,7 +105,7 @@ class Contributor < ActiveRecord::Base
 
     if filter == nil
       select_clause = %Q{
-         SELECT kind, COUNT(*) as number
+         SELECT kind, COUNT( distinct contributors.id) as number
          FROM contributors
          JOIN contributions ON contributors.id = contributions.contributor_id
          JOIN candidates ON contributions.candidate_id = candidates.id
@@ -103,7 +113,7 @@ class Contributor < ActiveRecord::Base
          GROUP BY kind }
     else
       select_clause = %Q{
-         SELECT kind, COUNT(*) as number
+         SELECT kind, COUNT( distinct contributors.id) as number
          FROM contributors
          JOIN contributions ON contributors.id = contributions.contributor_id
          JOIN candidates ON contributions.candidate_id = candidates.id
@@ -125,7 +135,7 @@ class Contributor < ActiveRecord::Base
 
     if filter == nil
       select_clause = %Q{
-         SELECT kind, COUNT(*) as number
+         SELECT kind, COUNT( distinct contributors.id) as number
          FROM contributors
          JOIN contributions ON contributors.id = contributions.contributor_id
          JOIN candidates ON contributions.candidate_id = candidates.id
@@ -133,7 +143,7 @@ class Contributor < ActiveRecord::Base
          GROUP BY kind }
     else
       select_clause = %Q{
-         SELECT kind, COUNT(*) as number
+         SELECT kind, COUNT( distinct contributors.id) as number
          FROM contributors
          JOIN contributions ON contributors.id = contributions.contributor_id
          JOIN candidates ON contributions.candidate_id = candidates.id

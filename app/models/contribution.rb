@@ -118,17 +118,26 @@ class Contribution < ActiveRecord::Base
   end
 
   def self.get_contributor_subtotal(column_name, search, filter)
+    operator = "LIKE"
+    if column_name == :total
+      value = search.to_i * 100  # get the number into the range of stored values
+      search = value.to_s
+      operator = ">="
+    else
+      search = %Q{'%#{search}%'}
+    end
+
     if filter == nil
       select_clause =
        %Q{SELECT SUM(amount) as total FROM contributions
           INNER JOIN contributors ON contributions.contributor_id = contributors.id
-          WHERE contributors.#{column_name.to_s} LIKE '%#{search}%'}
+          WHERE contributors.#{column_name.to_s} #{operator} #{search}}
     else
       select_clause =
        %Q{SELECT SUM(amount) as total FROM contributions
           INNER JOIN contributors ON contributions.contributor_id = contributors.id
           JOIN candidates ON contributions.candidate_id = candidates.id
-          WHERE candidates.elected = 't' AND contributors.#{column_name.to_s} LIKE '%#{search}%'}
+          WHERE candidates.elected = 't' AND contributors.#{column_name.to_s} #{operator} #{search}}
     end
     contributions = Contribution.connection.select_all(select_clause)
     amount = contributions[0]
@@ -255,12 +264,21 @@ class Contribution < ActiveRecord::Base
   end
 
   def self.get_contributor_contributions_composition_by_selection(column_name, search, filter)
+    operator = "LIKE"
+    if column_name == :total
+      value = search.to_i * 100  # get the number into the range of stored values
+      search = value.to_s
+      operator = ">="
+    else
+      search = %Q{'%#{search}%'}
+    end
+
     if filter == nil
       select_clause = %Q{
        SELECT kind, COUNT(*) as number, SUM(amount) as total
        FROM contributors JOIN contributions
        ON contributors.id = contributions.contributor_id
-       WHERE contributors.#{column_name} LIKE '%#{search}%'
+       WHERE contributors.#{column_name} #{operator} #{search}
        GROUP BY kind }
     else
       select_clause = %Q{
@@ -268,7 +286,7 @@ class Contribution < ActiveRecord::Base
        FROM contributors
        JOIN contributions ON contributors.id = contributions.contributor_id
        INNER JOIN candidates ON contributions.candidate_id = candidates.id
-       WHERE candidates.elected = 't' AND contributors.#{column_name} LIKE '%#{search}%'
+       WHERE candidates.elected = 't' AND contributors.#{column_name} #{operator} #{search}
        GROUP BY kind }
     end
     Contribution.connection.select_all(select_clause)

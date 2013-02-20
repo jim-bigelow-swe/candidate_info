@@ -1,28 +1,25 @@
 <div id='total_contribution'>
    <%= @total_message %>: <%= @total_contributions.to_f/100 %>
-  <table>
-  <tr>
-   <td>
-    <table id="contributions_analysis">
+   <table id="contributions_analysis">
      <caption>Summary of Contributions</caption>
-     <tr> <th colspan=2>Contributors</th><th colspan=2>Contributions</th></tr>
-     <tr> <th>No.</th><th>Type</th><th>No.</th><th>Amount</th></tr>
+     <tr> <th colspan=2>Contributors</th><th colspan=2 class="n_contrib">Contributions</th></tr>
+     <tr> <th>Number</th><th>Type</th><th class="n_contrib">Number</th><th>Amount</th></tr>
        <% @contribution_mix.each do |portion| %>
         <tr>
-          <td>
+          <td class="n_contrib">
              <% @contributor_counts.each do |contrib| %>
                <%=  contrib["number"] if contrib["kind"] == portion["kind"] %>
             <% end %>
            </td>
           <td><span class="contributor_kind"> <%= portion["kind"] %></span></td>
-          <td><%= portion["number"] %> </td>
+          <td class="n_contrib"><%= portion["number"] %> </td>
           <td><%= portion["total"].to_f/100 %> </td>
        </tr>
      <% end %>
-    </table>
-   </td>
-   <td>  <img src="<%= @contributor_chart_url %>" /> </td>
-   <td>  <img src="<%= @contribution_chart_url %>" /> </td>
-  </tr>
+    <tr>
+      <td colspan=2> <img src="<%= @contributor_chart_url %>" /> </td>
+      <td>           <img src="<%= @contribution_chart_url %>" /> </td>
+      <td>           <img src="<%= @contribution_percent_chart_url %>" /> </td>
+    </tr>
   </table>
 </div>

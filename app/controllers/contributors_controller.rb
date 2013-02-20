@@ -59,7 +59,11 @@ class ContributorsController < ApplicationController
 
     if params[:commit] =~ /Search/
       #debugger
-      @total_message = "Total of all contributions selected by #{params[:search]}"
+      if ordering == :total
+        @total_message = "Total of all contributions greater than or equal to #{params[:search]}"
+      else
+        @total_message = %Q{Total of all contributions selected by: "#{ordering} #{params[:search]}"}
+      end
       @contributors = Contributor.search params[:search], params[:page], ordering, filter
 
       @total_contributions = Contribution.get_contributor_subtotal ordering, params[:search], filter
@@ -83,7 +87,7 @@ class ContributorsController < ApplicationController
     @contributor_counts.each do |part|
       total += part["number"].to_f
     end
-    chart =  GoogleChart::PieChart.new('130x100', "Contributors", false)
+    chart =  GoogleChart::PieChart.new('130x75', "", false)
     @contributor_counts.each do |part|
       chart.data part["kind"][0], ((part["number"].to_f/total) * 100).to_i
     end
@@ -91,17 +95,25 @@ class ContributorsController < ApplicationController
     chart.show_labels = false
     @contributor_chart_url = chart.to_url
 
-    #debugger
     total_number_of_contributions = 0
     @contribution_mix.each do |portion|
       total_number_of_contributions += portion["number"].to_f
     end
-    chart =  GoogleChart::PieChart.new('80x100', "Contributions", false)
+    chart =  GoogleChart::PieChart.new('75x75', "", false)
     @contribution_mix.each do |portion|
       chart.data portion["kind"][0], ((portion["number"].to_f/total_number_of_contributions.to_f) * 100).to_i
     end
     chart.show_labels = false
     @contribution_chart_url = chart.to_url
+
+
+    chart =  GoogleChart::PieChart.new('75x75', "", false)
+    @contribution_mix.each do |portion|
+      chart.data portion["kind"][0], ((portion["total"].to_f/@total_contributions.to_f) * 100).to_i
+    end
+    chart.show_labels = false
+    chart.show_legend = false
+    @contribution_percent_chart_url = chart.to_url
 
     respond_to do |format|
       format.html # index.html.erb

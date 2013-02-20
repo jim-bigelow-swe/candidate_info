@@ -14,6 +14,8 @@ class Candidate < ActiveRecord::Base
       value = search.to_i * 100  # get the number into the range of stored values
       search = value.to_s
       operator = ">="
+    elsif ordering == :district
+      operator = "="
     else
       operator = %Q{LIKE}
       search = %Q{%#{search}%}

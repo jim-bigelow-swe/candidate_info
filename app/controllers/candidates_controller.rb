@@ -79,7 +79,6 @@ class CandidatesController < ApplicationController
       filter = params[:elected]
     end
 
-    #debugger
     if filter.nil?
       @elected_checked = false
     else
@@ -94,9 +93,9 @@ class CandidatesController < ApplicationController
       end
       # for total_contributions partial
       if ordering == :total
-        @total_message = "Total of all contributions where Candidate Total >= #{params[:search]}"
+        @total_message = "Total of all contributions where candidate received more than  #{params[:search]}"
       else
-        @total_message = "Total of all contributions selected by #{params[:search]}"
+        @total_message = %Q{Total of all contributions selected by: "#{ordering} #{params[:search]}"}
       end
       @total_contributions = Contribution.get_candidate_subtotal(ordering, params[:search], filter)
       @contribution_mix = Contribution.get_candidate_contributions_composition_by_selection ordering, params[:search], filter
@@ -127,7 +126,7 @@ class CandidatesController < ApplicationController
     @contributor_counts.each do |part|
       total += part["number"].to_f
     end
-    chart =  GoogleChart::PieChart.new('130x100', "Contributors", false)
+    chart =  GoogleChart::PieChart.new('130x75', "", false)
     @contributor_counts.each do |part|
       chart.data part["kind"][0], ((part["number"].to_f/total) * 100).to_i
     end
@@ -141,12 +140,20 @@ class CandidatesController < ApplicationController
     @contribution_mix.each do |portion|
       total_number_of_contributions += portion["number"].to_f
     end
-    chart =  GoogleChart::PieChart.new('80x100', "Contributions", false)
+    chart =  GoogleChart::PieChart.new('75x75', "", false)
     @contribution_mix.each do |portion|
       chart.data portion["kind"][0], ((portion["number"].to_f/total_number_of_contributions.to_f) * 100).to_i
     end
     chart.show_labels = false
     @contribution_chart_url = chart.to_url
+
+    chart =  GoogleChart::PieChart.new('75x75', "", false)
+    @contribution_mix.each do |portion|
+      chart.data portion["kind"][0], ((portion["total"].to_f/@total_contributions.to_f) * 100).to_i
+    end
+    chart.show_labels = false
+    chart.show_legend = false
+    @contribution_percent_chart_url = chart.to_url
 
     respond_to do |format|
       format.html # index.html.erb
