@@ -68,7 +68,7 @@ class Contributor < ActiveRecord::Base
       operator = ">="
     else
       operator = %Q{LIKE}
-      search = %Q{"%#{search}%"}
+      search = %Q{'%#{search}%'}
     end
 
     if filter == nil
